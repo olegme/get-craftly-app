@@ -1,10 +1,70 @@
 import React, { useState } from 'react';
 import { Plus, MoreHorizontal, Calendar } from 'lucide-react';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+const ItemTypes = {
+  CARD: 'card',
+};
+
+const DraggableCard = ({ card, columnId, rowIndex }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.CARD,
+    item: { ...card, sourceColumnId: columnId, sourceRowIndex: rowIndex },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
+  return (
+    <div
+      ref={drag}
+      className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
+        {card.priority && (
+          <span className={`text-xs font-medium ${card.priorityColor}`}>
+            {card.priority}
+          </span>
+        )}
+      </div>
+      <p className="text-sm text-gray-800 mb-3 leading-relaxed">{card.title}</p>
+      <div className="flex items-center justify-between">
+        <span className={`px-2 py-1 rounded text-xs font-medium ${card.categoryColor}`}>
+          {card.category}
+        </span>
+        <div className="flex items-center text-xs text-gray-500">
+          <Calendar className="w-3 h-3 mr-1" />
+          {card.date}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DropZone = ({ children, columnId, rowIndex, moveCard }) => {
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: ItemTypes.CARD,
+    drop: (item) => moveCard(item, columnId, rowIndex),
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  }));
+
+  return (
+    <div
+      ref={drop}
+      className={`min-h-20 rounded-lg p-2 transition-colors ${
+        isOver ? 'bg-blue-50 border-2 border-blue-200 border-dashed' : 'bg-gray-50'
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const MainBoard = () => {
-  const [draggedItem, setDraggedItem] = useState(null);
-  const [dragOverInfo, setDragOverInfo] = useState({ columnId: null, rowIndex: null });
-
   const [columns, setColumns] = useState([
     {
       id: 'discovery',
@@ -153,90 +213,33 @@ const MainBoard = () => {
     }
   ]);
 
-  const handleDragStart = (e, card, columnId, rowIndex) => {
-    setDraggedItem({ card, sourceColumn: columnId, sourceRow: rowIndex });
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e, columnId, rowIndex) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDragOverInfo({ columnId, rowIndex });
-  };
-
-  const handleDragLeave = () => {
-    setDragOverInfo({ columnId: null, rowIndex: null });
-  };
-
-  const handleDrop = (e, targetColumnId, targetRowIndex) => {
-    e.preventDefault();
-    if (!draggedItem) return;
-
-    const { card, sourceColumn, sourceRow } = draggedItem;
-    
-    if (sourceColumn === targetColumnId && sourceRow === targetRowIndex) {
-      setDraggedItem(null);
-      setDragOverInfo({ columnId: null, rowIndex: null });
-      return;
-    }
-
-    setColumns(prevColumns => {
-      const newColumns = [...prevColumns];
+  const moveCard = (draggedCard, targetColumnId, targetRowIndex) => {
+    setColumns((prevColumns) => {
+      const newColumns = JSON.parse(JSON.stringify(prevColumns));
       
+      const { sourceColumnId, sourceRowIndex } = draggedCard;
+
+      // Find the card to move
+      const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
+      const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
+
+      if (!card) return prevColumns;
+
       // Remove from source
-      const sourceColumnIndex = newColumns.findIndex(col => col.id === sourceColumn);
-      newColumns[sourceColumnIndex].rows[sourceRow].cards = 
-        newColumns[sourceColumnIndex].rows[sourceRow].cards.filter(c => c.id !== card.id);
+      sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
       
       // Add to target
-      const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
-      newColumns[targetColumnIndex].rows[targetRowIndex].cards.push(card);
+      const targetColumn = newColumns.find(c => c.id === targetColumnId);
+      targetColumn.rows[targetRowIndex].cards.push(card);
       
       return newColumns;
     });
-
-    setDraggedItem(null);
-    setDragOverInfo({ columnId: null, rowIndex: null });
   };
-
-  const Card = ({ card, columnId, rowIndex }) => (
-    <div
-      draggable
-      onDragStart={(e) => handleDragStart(e, card, columnId, rowIndex)}
-      className="bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow"
-    >
-      <div className="flex items-start justify-between mb-2">
-        <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
-        {card.priority && (
-          <span className={`text-xs font-medium ${card.priorityColor}`}>
-            {card.priority}
-          </span>
-        )}
-      </div>
-      
-      <p className="text-sm text-gray-800 mb-3 leading-relaxed">
-        {card.title}
-      </p>
-      
-      <div className="flex items-center justify-between">
-        <span className={`px-2 py-1 rounded text-xs font-medium ${card.categoryColor}`}>
-          {card.category}
-        </span>
-        <div className="flex items-center text-xs text-gray-500">
-          <Calendar className="w-3 h-3 mr-1" />
-          {card.date}
-        </div>
-      </div>
-    </div>
-  );
 
   const AddTaskButton = ({ columnId, rowIndex }) => (
     <button
       className="w-full p-2 text-left text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center"
-      onClick={() => {
-        // Add new task logic here
-        console.log(`Add task to column ${columnId}, row ${rowIndex}`);
-      }}
+      onClick={() => console.log(`Add task to column ${columnId}, row ${rowIndex}`)}
     >
       <Plus className="w-4 h-4 mr-2" />
       Add task
@@ -254,40 +257,27 @@ const MainBoard = () => {
                 <MoreHorizontal className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700" />
               </div>
               
-              {column.rows.map((row, rowIndex) => {
-                const rowNames = ['In the works', 'Planned', 'Completed'];
-                return (
-                  <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        {rowNames[rowIndex]}
-                      </span>
-                    </div>
-                    
-                    <div
-                      className={`min-h-20 rounded-lg p-2 transition-colors ${
-                        dragOverInfo.columnId === column.id && dragOverInfo.rowIndex === rowIndex
-                          ? 'bg-blue-50 border-2 border-blue-200 border-dashed'
-                          : 'bg-gray-50'
-                      }`}
-                      onDragOver={(e) => handleDragOver(e, column.id, rowIndex)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, column.id, rowIndex)}
-                    >
-                      {row.cards.map((card) => (
-                        <Card 
-                          key={card.id} 
-                          card={card} 
-                          columnId={column.id} 
-                          rowIndex={rowIndex}
-                        />
-                      ))}
-                      
-                      <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
-                    </div>
+              {column.rows.map((row, rowIndex) => (
+                <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      Row {rowIndex + 1}
+                    </span>
                   </div>
-                );
-              })}
+                  
+                  <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
+                    {row.cards.map((card) => (
+                      <DraggableCard 
+                        key={card.id} 
+                        card={card} 
+                        columnId={column.id} 
+                        rowIndex={rowIndex}
+                      />
+                    ))}
+                    <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
+                  </DropZone>
+                </div>
+              ))}
             </div>
           </div>
         ))}
@@ -296,4 +286,10 @@ const MainBoard = () => {
   );
 };
 
-export default MainBoard;
+const MainBoardWrapper = () => (
+  <DndProvider backend={HTML5Backend}>
+    <MainBoard />
+  </DndProvider>
+);
+
+export default MainBoardWrapper;
