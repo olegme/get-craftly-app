@@ -1,0 +1,1 @@
+After any change run linting, but don't run the application unless explicitly commanded to to so

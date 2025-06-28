@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Plus, MoreHorizontal, Calendar } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -7,14 +7,58 @@ const ItemTypes = {
   CARD: 'card',
 };
 
-const DraggableCard = ({ card, columnId, rowIndex }) => {
+const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(card.title);
+  const inputRef = useRef(null);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
     item: { ...card, sourceColumnId: columnId, sourceRowIndex: rowIndex },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
+    canDrag: !isEditing,
   }));
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleTitleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const handleSave = () => {
+    if (title.trim()) {
+      updateCardTitle(card.id, columnId, rowIndex, title);
+    } else {
+      setTitle(card.title);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTitle(card.title);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave();
+    }
+    if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
 
   return (
     <div
@@ -29,7 +73,40 @@ const DraggableCard = ({ card, columnId, rowIndex }) => {
           </span>
         )}
       </div>
-      <p className="text-sm text-gray-800 mb-3 leading-relaxed">{card.title}</p>
+
+      {isEditing ? (
+        <>
+          <textarea
+            ref={inputRef}
+            value={title}
+            onChange={handleTitleChange}
+            onKeyDown={handleKeyDown}
+            className="w-full text-sm text-gray-800 mb-2 p-1 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          />
+          <div className="flex items-center justify-end gap-2 mb-3">
+            <button
+              onClick={handleSave}
+              className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Save
+            </button>
+            <button
+              onClick={handleCancel}
+              className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      ) : (
+        <p
+          onClick={handleTitleClick}
+          className="text-sm text-gray-800 mb-3 leading-relaxed cursor-pointer"
+        >
+          {card.title}
+        </p>
+      )}
+
       <div className="flex items-center justify-between">
         <span className={`px-2 py-1 rounded text-xs font-medium ${card.categoryColor}`}>
           {card.category}
@@ -219,19 +296,26 @@ const MainBoard = () => {
       
       const { sourceColumnId, sourceRowIndex } = draggedCard;
 
-      // Find the card to move
       const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
       const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
 
       if (!card) return prevColumns;
 
-      // Remove from source
       sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
       
-      // Add to target
       const targetColumn = newColumns.find(c => c.id === targetColumnId);
       targetColumn.rows[targetRowIndex].cards.push(card);
       
+      return newColumns;
+    });
+  };
+
+  const updateCardTitle = (cardId, columnId, rowIndex, newTitle) => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
+      newColumns[columnIndex].rows[rowIndex].cards[cardIndex].title = newTitle;
       return newColumns;
     });
   };
@@ -272,6 +356,7 @@ const MainBoard = () => {
                         card={card} 
                         columnId={column.id} 
                         rowIndex={rowIndex}
+                        updateCardTitle={updateCardTitle}
                       />
                     ))}
                     <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
