@@ -69,6 +69,10 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
             {card.priority}
           </span>
         )}
+        <div className="flex items-center text-xs text-gray-500">
+          <Calendar className="w-3 h-3 mr-1" />
+          {card.date}
+        </div>
       </div>
 
       {isEditing ? (
@@ -111,10 +115,7 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
           updateCardTags={(newTags) => updateCardTags(card.id, columnId, rowIndex, newTags)}
           addNewTag={addNewTag}
         />
-        <div className="flex items-center text-xs text-gray-500">
-          <Calendar className="w-3 h-3 mr-1" />
-          {card.date}
-        </div>
+        {/* Date div moved */}
       </div>
     </div>
   );

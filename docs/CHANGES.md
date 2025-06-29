@@ -16,3 +16,9 @@
 ### Bug Fixes
 
 *   **Card Data Restoration:** Restored the initial card data that was accidentally removed during a previous update.
+
+## Session at 2025-06-29
+
+### Features
+
+*   **Card Layout:** Moved the date field to the upper right corner of the card in `DraggableCard.jsx` for improved visual layout.
