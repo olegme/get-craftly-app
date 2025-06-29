@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Flag, FlagOff } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag }) => {
+export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -63,12 +63,25 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
-        {card.priority && (
-          <span className={`text-xs font-medium ${card.priorityColor}`}>
-            {card.priority}
-          </span>
-        )}
+        <input type="checkbox" checked={card.completed} onChange={() => toggleCardCompleted(card.id, columnId, rowIndex)} className="mt-1 rounded" />
+        
+        <div className="flex items-center text-xs text-gray-500">
+          {
+            card.priority ? (
+              <Flag
+                className="w-3 h-3 mr-1 text-red-500 fill-current cursor-pointer"
+                onClick={() => toggleCardPriority(card.id, columnId, rowIndex)}
+              />
+            ) : (
+              <FlagOff
+                className="w-3 h-3 mr-1 text-gray-400 cursor-pointer"
+                onClick={() => toggleCardPriority(card.id, columnId, rowIndex)}
+              />
+            )
+          }
+          <Calendar className="w-3 h-3 mr-1" />
+          {card.date}
+        </div>
       </div>
 
       {isEditing ? (
@@ -111,10 +124,7 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
           updateCardTags={(newTags) => updateCardTags(card.id, columnId, rowIndex, newTags)}
           addNewTag={addNewTag}
         />
-        <div className="flex items-center text-xs text-gray-500">
-          <Calendar className="w-3 h-3 mr-1" />
-          {card.date}
-        </div>
+        {/* Date div moved */}
       </div>
     </div>
   );
