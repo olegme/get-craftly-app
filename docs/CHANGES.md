@@ -25,3 +25,4 @@
 *   **Priority Flag:** Implemented a toggleable priority flag using boolean state, replacing the text field with `Flag` and `FlagOff` icons in `DraggableCard.jsx` and updating state management in `MainBoard.jsx` and `api/board.js`.
 *   **Card Completion:** Implemented automatic movement of cards to the 'Done' row within the same lane when their completion status is toggled in `DraggableCard.jsx` and `MainBoard.jsx`.
 *   **Data Consistency:** Ensured data consistency on initial load by marking cards in 'Done' rows as completed in `MainBoard.jsx`.
+*   **Drag and Drop Completion:** Ensured that dragging a card to a 'Done' row automatically updates its completion status in `MainBoard.jsx`.

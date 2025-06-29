@@ -54,6 +54,14 @@ const MainBoard = () => {
       sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
       
       const targetColumn = newColumns.find(c => c.id === targetColumnId);
+      
+      // Update completed status based on target row
+      if (targetColumn.rows[targetRowIndex].title === 'Done') {
+        card.completed = true;
+      } else {
+        card.completed = false;
+      }
+
       targetColumn.rows[targetRowIndex].cards.push(card);
       
       return newColumns;
