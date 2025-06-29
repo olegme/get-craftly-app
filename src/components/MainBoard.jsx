@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { DraggableCard } from './Card/DraggableCard';
 import { DropZone } from './Board/DropZone';
+import { ColumnHeader } from './Board/ColumnHeader';
 
 const MainBoard = () => {
   const [columns, setColumns] = useState([
@@ -11,7 +12,8 @@ const MainBoard = () => {
       id: 'discovery',
       title: 'Project Discovery',
       rows: [
-        {
+        { 
+          title: 'WIP',
           cards: [
             {
               id: 'card1',
@@ -21,6 +23,11 @@ const MainBoard = () => {
               tags: [{ name: 'Research', color: 'bg-red-100 text-red-600' }],
               date: 'Aug 10'
             },
+          ]
+        },
+        { 
+          title: 'Planned',
+          cards: [
             {
               id: 'card2',
               title: 'Research competitor CRM features and user feedback',
@@ -29,8 +36,8 @@ const MainBoard = () => {
             }
           ]
         },
-        { cards: [] },
-        {
+        { 
+          title: 'Done',
           cards: [
             {
               id: 'card3',
@@ -47,7 +54,8 @@ const MainBoard = () => {
       id: 'design',
       title: 'Design & Prototyping',
       rows: [
-        {
+        { 
+          title: 'WIP',
           cards: [
             {
               id: 'card4',
@@ -57,7 +65,8 @@ const MainBoard = () => {
             }
           ]
         },
-        {
+        { 
+          title: 'Planned',
           cards: [
             {
               id: 'card5',
@@ -67,14 +76,15 @@ const MainBoard = () => {
             }
           ]
         },
-        { cards: [] }
+        { title: 'Done', cards: [] }
       ]
     },
     {
       id: 'development',
       title: 'Development Backlog',
       rows: [
-        {
+        { 
+          title: 'WIP',
           cards: [
             {
               id: 'card6',
@@ -84,7 +94,8 @@ const MainBoard = () => {
             }
           ]
         },
-        {
+        { 
+          title: 'Planned',
           cards: [
             {
               id: 'card7',
@@ -94,7 +105,8 @@ const MainBoard = () => {
             }
           ]
         },
-        {
+        { 
+          title: 'Done',
           cards: [
             {
               id: 'card8',
@@ -110,7 +122,8 @@ const MainBoard = () => {
       id: 'testing',
       title: 'Testing & QA',
       rows: [
-        {
+        { 
+          title: 'WIP',
           cards: [
             {
               id: 'card9',
@@ -120,7 +133,8 @@ const MainBoard = () => {
             }
           ]
         },
-        {
+        { 
+          title: 'Planned',
           cards: [
             {
               id: 'card10',
@@ -130,16 +144,16 @@ const MainBoard = () => {
             }
           ]
         },
-        { cards: [] }
+        { title: 'Done', cards: [] }
       ]
     },
     {
       id: 'deployment',
       title: 'Deployment',
       rows: [
-        { cards: [] },
-        { cards: [] },
-        { cards: [] }
+        { title: 'WIP', cards: [] },
+        { title: 'Planned', cards: [] },
+        { title: 'Done', cards: [] },
       ]
     }
   ]);
@@ -199,6 +213,34 @@ const MainBoard = () => {
     });
   };
 
+  const updateColumnTitle = (columnId, newTitle) => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      newColumns[columnIndex].title = newTitle;
+      return newColumns;
+    });
+  };
+
+  const addLane = (columnId) => {
+    const newLane = {
+      id: `new-lane-${Date.now()}`,
+      title: 'New Lane',
+      rows: [ { title: 'WIP', cards: [] }, { title: 'Planned', cards: [] }, { title: 'Done', cards: [] } ],
+    };
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      newColumns.splice(columnIndex + 1, 0, newLane);
+      return newColumns;
+    });
+  };
+
+  const deleteLane = () => {
+    // Placeholder for delete lane logic
+    console.log("Delete lane clicked");
+  };
+
   const AddTaskButton = ({ columnId, rowIndex }) => (
     <button
       className="w-full p-2 text-left text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center"
@@ -215,16 +257,18 @@ const MainBoard = () => {
         {columns.map((column) => (
           <div key={column.id} className="flex-shrink-0 w-80">
             <div className="bg-gray-100 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-gray-800">{column.title}</h2>
-                <MoreHorizontal className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gray-700" />
-              </div>
+              <ColumnHeader 
+                title={column.title} 
+                updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
+                addLane={() => addLane(column.id)}
+                deleteLane={deleteLane}
+              />
               
               {column.rows.map((row, rowIndex) => (
                 <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                      Row {rowIndex + 1}
+                      {row.title}
                     </span>
                   </div>
                   
