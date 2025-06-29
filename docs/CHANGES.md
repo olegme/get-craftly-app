@@ -26,3 +26,4 @@
 *   **Card Completion:** Implemented automatic movement of cards to the 'Done' row within the same lane when their completion status is toggled in `DraggableCard.jsx` and `MainBoard.jsx`.
 *   **Data Consistency:** Ensured data consistency on initial load by marking cards in 'Done' rows as completed in `MainBoard.jsx`.
 *   **Drag and Drop Completion:** Ensured that dragging a card to a 'Done' row automatically updates its completion status in `MainBoard.jsx`.
+*   **Add Card Functionality:** Refactored 'Add Task' button to dynamically display an input field and save/cancel buttons upon click, improving user experience for adding new cards in `MainBoard.jsx`.
