@@ -6,10 +6,13 @@ import { DraggableCard } from './Card/DraggableCard';
 import { DropZone } from './Board/DropZone';
 import { ColumnHeader } from './Board/ColumnHeader';
 import { getBoardData } from '../api/board';
+import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
 const MainBoard = () => {
   const [columns, setColumns] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [laneToDelete, setLaneToDelete] = useState(null);
 
   useEffect(() => {
     getBoardData().then(data => {
@@ -85,9 +88,27 @@ const MainBoard = () => {
     });
   };
 
-  const deleteLane = () => {
-    // Placeholder for delete lane logic
-    console.log("Delete lane clicked");
+  const handleDeleteLane = (columnId) => {
+    const columnToDelete = columns.find(col => col.id === columnId);
+    const hasCards = columnToDelete.rows.some(row => row.cards.length > 0);
+
+    if (hasCards) {
+      setLaneToDelete(columnId);
+      setDialogOpen(true);
+    } else {
+      setColumns(prevColumns => prevColumns.filter(col => col.id !== columnId));
+    }
+  };
+
+  const confirmDelete = () => {
+    setColumns(prevColumns => prevColumns.filter(col => col.id !== laneToDelete));
+    setDialogOpen(false);
+    setLaneToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setDialogOpen(false);
+    setLaneToDelete(null);
   };
 
   const AddTaskButton = ({ columnId, rowIndex }) => (
@@ -101,48 +122,56 @@ const MainBoard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start" style={{display: 'flex', justifyContent: 'center'}}>
-        {columns.map((column) => (
-          <div key={column.id} className="flex-shrink-0 w-80">
-            <div className="bg-gray-100 rounded-lg p-4">
-              <ColumnHeader 
-                title={column.title} 
-                updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
-                addLane={() => addLane(column.id)}
-                deleteLane={deleteLane}
-              />
-              
-              {column.rows.map((row, rowIndex) => (
-                <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                      {row.title}
-                    </span>
+    <>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start" style={{display: 'flex', justifyContent: 'center'}}>
+          {columns.map((column) => (
+            <div key={column.id} className="flex-shrink-0 w-80">
+              <div className="bg-gray-100 rounded-lg p-4">
+                <ColumnHeader 
+                  title={column.title} 
+                  updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
+                  addLane={() => addLane(column.id)}
+                  deleteLane={() => handleDeleteLane(column.id)}
+                />
+                
+                {column.rows.map((row, rowIndex) => (
+                  <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        {row.title}
+                      </span>
+                    </div>
+                    
+                    <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
+                      {row.cards.map((card) => (
+                        <DraggableCard 
+                          key={card.id} 
+                          card={card} 
+                          columnId={column.id} 
+                          rowIndex={rowIndex}
+                          updateCardTitle={updateCardTitle}
+                          updateCardTags={updateCardTags}
+                          availableTags={availableTags}
+                          addNewTag={addNewTag}
+                        />
+                      ))}
+                      <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
+                    </DropZone>
                   </div>
-                  
-                  <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
-                    {row.cards.map((card) => (
-                      <DraggableCard 
-                        key={card.id} 
-                        card={card} 
-                        columnId={column.id} 
-                        rowIndex={rowIndex}
-                        updateCardTitle={updateCardTitle}
-                        updateCardTags={updateCardTags}
-                        availableTags={availableTags}
-                        addNewTag={addNewTag}
-                      />
-                    ))}
-                    <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
-                  </DropZone>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+      <ConfirmationDialog 
+        isOpen={dialogOpen} 
+        onConfirm={confirmDelete} 
+        onCancel={cancelDelete} 
+        message="This lane contains cards. Are you sure you want to delete it?"
+      />
+    </>
   );
 };
 
