@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Flag } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
@@ -64,12 +64,11 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
     >
       <div className="flex items-start justify-between mb-2">
         <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
-        {card.priority && (
-          <span className={`text-xs font-medium ${card.priorityColor}`}>
-            {card.priority}
-          </span>
-        )}
+        
         <div className="flex items-center text-xs text-gray-500">
+          {card.priority && (
+            <Flag className="w-3 h-3 mr-1 text-red-500 fill-current" />
+          )}
           <Calendar className="w-3 h-3 mr-1" />
           {card.date}
         </div>

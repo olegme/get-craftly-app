@@ -22,3 +22,4 @@
 ### Features
 
 *   **Card Layout:** Moved the date field to the upper right corner of the card in `DraggableCard.jsx` for improved visual layout.
+*   **Priority Flag:** Replaced priority text with a red flag icon next to the date field in `DraggableCard.jsx`.
