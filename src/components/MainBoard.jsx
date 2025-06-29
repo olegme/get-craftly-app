@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, MoreHorizontal, Calendar } from 'lucide-react';
+import { Plus, MoreHorizontal, Calendar, X } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -7,7 +7,127 @@ const ItemTypes = {
   CARD: 'card',
 };
 
-const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle }) => {
+const Tags = ({
+  tags,
+  availableTags,
+  updateCardTags,
+  addNewTag,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTag, setNewTag] = useState('');
+  const [filteredTags, setFilteredTags] = useState(availableTags);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    setFilteredTags(availableTags);
+  }, [availableTags]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsEditing(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [wrapperRef]);
+
+  const handleTagClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleTagChange = (tag) => {
+    const newTags = tags.some(t => t.name === tag.name)
+      ? tags.filter(t => t.name !== tag.name)
+      : [...tags, tag];
+    updateCardTags(newTags);
+  };
+
+  const handleNewTagChange = (e) => {
+    setNewTag(e.target.value);
+    setFilteredTags(
+      availableTags.filter((tag) =>
+        tag.name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
+  };
+
+  const handleNewTagSubmit = (e) => {
+    e.preventDefault();
+    if (newTag.trim() && !availableTags.find(t => t.name.toLowerCase() === newTag.trim().toLowerCase())) {
+      const newTagObject = { name: newTag.trim(), color: getNextColor() };
+      addNewTag(newTagObject);
+      updateCardTags([...tags, newTagObject]);
+    }
+    setNewTag('');
+  };
+
+  const getNextColor = () => {
+    const colors = [
+      'bg-red-100 text-red-600',
+      'bg-blue-100 text-blue-600',
+      'bg-green-100 text-green-600',
+      'bg-purple-100 text-purple-600',
+      'bg-yellow-100 text-yellow-700',
+      'bg-orange-100 text-orange-600',
+      'bg-pink-100 text-pink-600',
+      'bg-teal-100 text-teal-600',
+      'bg-indigo-100 text-indigo-600',
+    ];
+    const usedColors = availableTags.map(t => t.color);
+    const availableColors = colors.filter(c => !usedColors.includes(c));
+    return availableColors.length > 0 ? availableColors[0] : colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  return (
+    <div className="relative" ref={wrapperRef}>
+      <div className="flex flex-wrap gap-1">
+        {tags.map((tag, index) => (
+          <span
+            key={index}
+            onClick={handleTagClick}
+            className={`px-2 py-1 rounded text-xs font-medium cursor-pointer ${tag.color}`}
+          >
+            {tag.name}
+          </span>
+        ))}
+        <button onClick={handleTagClick} className="text-xs text-gray-500 hover:text-gray-700">+ Add</button>
+      </div>
+      {isEditing && (
+        <div className="absolute z-10 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200">
+          <form onSubmit={handleNewTagSubmit} className="p-2">
+            <input
+              type="text"
+              value={newTag}
+              onChange={handleNewTagChange}
+              placeholder="Add or find a tag..."
+              className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </form>
+          <ul className="py-1">
+            {filteredTags.map((tag, index) => (
+              <li
+                key={index}
+                onClick={() => handleTagChange(tag)}
+                className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+              >
+                <span className={`px-2 py-1 rounded text-xs font-medium ${tag.color}`}>
+                  {tag.name}
+                </span>
+                {tags.some(t => t.name === tag.name) && <span className="text-blue-500">✓</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -108,9 +228,12 @@ const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle }) => {
       )}
 
       <div className="flex items-center justify-between">
-        <span className={`px-2 py-1 rounded text-xs font-medium ${card.categoryColor}`}>
-          {card.category}
-        </span>
+        <Tags
+          tags={card.tags}
+          availableTags={availableTags}
+          updateCardTags={(newTags) => updateCardTags(card.id, columnId, rowIndex, newTags)}
+          addNewTag={addNewTag}
+        />
         <div className="flex items-center text-xs text-gray-500">
           <Calendar className="w-3 h-3 mr-1" />
           {card.date}
@@ -154,15 +277,13 @@ const MainBoard = () => {
               title: 'Conduct stakeholder interviews for new CRM feature',
               priority: 'High Priority',
               priorityColor: 'text-red-500',
-              category: 'Research',
-              categoryColor: 'bg-red-100 text-red-600',
+              tags: [{ name: 'Research', color: 'bg-red-100 text-red-600' }],
               date: 'Aug 10'
             },
             {
               id: 'card2',
               title: 'Research competitor CRM features and user feedback',
-              category: 'Research',
-              categoryColor: 'bg-blue-100 text-blue-600',
+              tags: [{ name: 'Research', color: 'bg-blue-100 text-blue-600' }],
               date: 'Aug 12'
             }
           ]
@@ -173,8 +294,7 @@ const MainBoard = () => {
             {
               id: 'card3',
               title: 'Define user personas and journey maps for improved UX',
-              category: 'UX',
-              categoryColor: 'bg-green-100 text-green-600',
+              tags: [{ name: 'UX', color: 'bg-green-100 text-green-600' }],
               date: 'Aug 14',
               completed: true
             }
@@ -191,8 +311,7 @@ const MainBoard = () => {
             {
               id: 'card4',
               title: 'Sketch initial wireframes for CRM dashboard UI',
-              category: 'Design',
-              categoryColor: 'bg-purple-100 text-purple-600',
+              tags: [{ name: 'Design', color: 'bg-purple-100 text-purple-600' }],
               date: 'Aug 15'
             }
           ]
@@ -202,8 +321,7 @@ const MainBoard = () => {
             {
               id: 'card5',
               title: 'Create high-fidelity mockups for core CRM functionalities',
-              category: 'Design',
-              categoryColor: 'bg-purple-100 text-purple-600',
+              tags: [{ name: 'Design', color: 'bg-purple-100 text-purple-600' }],
               date: 'Aug 18'
             }
           ]
@@ -220,8 +338,7 @@ const MainBoard = () => {
             {
               id: 'card6',
               title: 'Implement user authentication module (API & UI)',
-              category: 'Backend',
-              categoryColor: 'bg-yellow-100 text-yellow-700',
+              tags: [{ name: 'Backend', color: 'bg-yellow-100 text-yellow-700' }],
               date: 'Aug 20'
             }
           ]
@@ -231,8 +348,7 @@ const MainBoard = () => {
             {
               id: 'card7',
               title: 'Develop task management features (CRUD operations)',
-              category: 'Frontend',
-              categoryColor: 'bg-orange-100 text-orange-600',
+              tags: [{ name: 'Frontend', color: 'bg-orange-100 text-orange-600' }],
               date: 'Aug 22'
             }
           ]
@@ -242,8 +358,7 @@ const MainBoard = () => {
             {
               id: 'card8',
               title: 'Integrate external payment gateway for subscription model',
-              category: 'Integration',
-              categoryColor: 'bg-pink-100 text-pink-600',
+              tags: [{ name: 'Integration', color: 'bg-pink-100 text-pink-600' }],
               date: 'Aug 25'
             }
           ]
@@ -259,8 +374,7 @@ const MainBoard = () => {
             {
               id: 'card9',
               title: 'Write unit tests for authentication and task APIs',
-              category: 'QA',
-              categoryColor: 'bg-teal-100 text-teal-600',
+              tags: [{ name: 'QA', color: 'bg-teal-100 text-teal-600' }],
               date: 'Aug 28'
             }
           ]
@@ -270,8 +384,7 @@ const MainBoard = () => {
             {
               id: 'card10',
               title: 'Perform end-to-end testing of CRM workflow',
-              category: 'E2E',
-              categoryColor: 'bg-indigo-100 text-indigo-600',
+              tags: [{ name: 'E2E', color: 'bg-indigo-100 text-indigo-600' }],
               date: 'Aug 30'
             }
           ]
@@ -289,6 +402,21 @@ const MainBoard = () => {
       ]
     }
   ]);
+
+  const [availableTags, setAvailableTags] = useState([
+    { name: 'Research', color: 'bg-red-100 text-red-600' },
+    { name: 'UX', color: 'bg-green-100 text-green-600' },
+    { name: 'Design', color: 'bg-purple-100 text-purple-600' },
+    { name: 'Backend', color: 'bg-yellow-100 text-yellow-700' },
+    { name: 'Frontend', color: 'bg-orange-100 text-orange-600' },
+    { name: 'Integration', color: 'bg-pink-100 text-pink-600' },
+    { name: 'QA', color: 'bg-teal-100 text-teal-600' },
+    { name: 'E2E', color: 'bg-indigo-100 text-indigo-600' },
+  ]);
+
+  const addNewTag = (newTag) => {
+    setAvailableTags(prev => [...prev, newTag]);
+  };
 
   const moveCard = (draggedCard, targetColumnId, targetRowIndex) => {
     setColumns((prevColumns) => {
@@ -316,6 +444,16 @@ const MainBoard = () => {
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
       newColumns[columnIndex].rows[rowIndex].cards[cardIndex].title = newTitle;
+      return newColumns;
+    });
+  };
+
+  const updateCardTags = (cardId, columnId, rowIndex, newTags) => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
+      newColumns[columnIndex].rows[rowIndex].cards[cardIndex].tags = newTags;
       return newColumns;
     });
   };
@@ -357,6 +495,9 @@ const MainBoard = () => {
                         columnId={column.id} 
                         rowIndex={rowIndex}
                         updateCardTitle={updateCardTitle}
+                        updateCardTags={updateCardTags}
+                        availableTags={availableTags}
+                        addNewTag={addNewTag}
                       />
                     ))}
                     <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
