@@ -16,7 +16,22 @@ const MainBoard = () => {
 
   useEffect(() => {
     getBoardData().then(data => {
-      setColumns(data.columns);
+      const correctedColumns = data.columns.map(column => ({
+        ...column,
+        rows: column.rows.map(row => {
+          if (row.title === 'Done') {
+            return {
+              ...row,
+              cards: row.cards.map(card => ({
+                ...card,
+                completed: true, // Ensure cards in 'Done' row are marked as completed
+              })),
+            };
+          }
+          return row;
+        }),
+      }));
+      setColumns(correctedColumns);
       setAvailableTags(data.availableTags);
     });
   }, []);
@@ -113,16 +128,15 @@ const MainBoard = () => {
 
       // Find the 'Done' row (assuming it's always the last row, index 2)
       const doneRowIndex = currentColumn.rows.findIndex(row => row.title === 'Done');
-      if (doneRowIndex === -1) return prevColumns; // 'Done' row not found
+      const wipRowIndex = currentColumn.rows.findIndex(row => row.title === 'WIP');
 
-      // Add card to 'Done' row if completed, otherwise keep it in its current row
+      if (doneRowIndex === -1 || wipRowIndex === -1) return prevColumns; // 'Done' or 'WIP' row not found
+
+      // Add card to 'Done' row if completed, otherwise move to 'WIP' row
       if (cardToMove.completed) {
         currentColumn.rows[doneRowIndex].cards.push(cardToMove);
       } else {
-        // If unchecking, put it back to its original row (or handle as per specific requirement)
-        // For now, we'll just leave it in the row it was unchecked from.
-        // A more complex solution might involve remembering its original row.
-        currentColumn.rows[rowIndex].cards.push(cardToMove);
+        currentColumn.rows[wipRowIndex].cards.push(cardToMove);
       }
 
       return newColumns;
