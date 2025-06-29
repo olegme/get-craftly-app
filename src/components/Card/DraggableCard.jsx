@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Flag } from 'lucide-react';
+import { Calendar, Flag, FlagOff } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag }) => {
+export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -66,9 +66,19 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
         <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
         
         <div className="flex items-center text-xs text-gray-500">
-          {card.priority && (
-            <Flag className="w-3 h-3 mr-1 text-red-500 fill-current" />
-          )}
+          {
+            card.priority ? (
+              <Flag
+                className="w-3 h-3 mr-1 text-red-500 fill-current cursor-pointer"
+                onClick={() => toggleCardPriority(card.id, columnId, rowIndex)}
+              />
+            ) : (
+              <FlagOff
+                className="w-3 h-3 mr-1 text-gray-400 cursor-pointer"
+                onClick={() => toggleCardPriority(card.id, columnId, rowIndex)}
+              />
+            )
+          }
           <Calendar className="w-3 h-3 mr-1" />
           {card.date}
         </div>

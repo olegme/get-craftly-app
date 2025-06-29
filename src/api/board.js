@@ -10,8 +10,7 @@ const boardData = {
             {
               id: 'card1',
               title: 'Conduct stakeholder interviews for new CRM feature',
-              priority: 'High Priority',
-              priorityColor: 'text-red-500',
+              priority: true,
               tags: [{ name: 'Research', color: 'bg-red-100 text-red-600' }],
               date: 'Aug 10'
             },

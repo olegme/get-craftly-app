@@ -65,6 +65,38 @@ const MainBoard = () => {
     });
   };
 
+  const toggleCardPriority = (cardId, columnId, rowIndex) => {
+    setColumns(prevColumns => {
+      const newColumns = prevColumns.map(col => {
+        if (col.id === columnId) {
+          return {
+            ...col,
+            rows: col.rows.map((row, rIdx) => {
+              if (rIdx === rowIndex) {
+                return {
+                  ...row,
+                  cards: row.cards.map(card => {
+                    if (card.id === cardId) {
+                      
+                      return {
+                        ...card,
+                        priority: !card.priority,
+                      };
+                    }
+                    return card;
+                  }),
+                };
+              }
+              return row;
+            }),
+          };
+        }
+        return col;
+      });
+      return newColumns;
+    });
+  };
+
   const updateColumnTitle = (columnId, newTitle) => {
     setColumns(prevColumns => {
       const newColumns = [...prevColumns];
@@ -154,6 +186,7 @@ const MainBoard = () => {
                           updateCardTags={updateCardTags}
                           availableTags={availableTags}
                           addNewTag={addNewTag}
+                          toggleCardPriority={toggleCardPriority}
                         />
                       ))}
                       <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
