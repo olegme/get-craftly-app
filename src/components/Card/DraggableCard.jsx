@@ -4,7 +4,7 @@ import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority }) => {
+export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -63,7 +63,7 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <input type="checkbox" defaultChecked={card.completed} className="mt-1 rounded" />
+        <input type="checkbox" checked={card.completed} onChange={() => toggleCardCompleted(card.id, columnId, rowIndex)} className="mt-1 rounded" />
         
         <div className="flex items-center text-xs text-gray-500">
           {

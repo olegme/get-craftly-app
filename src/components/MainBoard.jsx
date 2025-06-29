@@ -77,7 +77,6 @@ const MainBoard = () => {
                   ...row,
                   cards: row.cards.map(card => {
                     if (card.id === cardId) {
-                      
                       return {
                         ...card,
                         priority: !card.priority,
@@ -93,6 +92,39 @@ const MainBoard = () => {
         }
         return col;
       });
+      return newColumns;
+    });
+  };
+
+  const toggleCardCompleted = (cardId, columnId, rowIndex) => {
+    setColumns(prevColumns => {
+      const newColumns = JSON.parse(JSON.stringify(prevColumns)); // Deep copy for easier manipulation
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      const currentColumn = newColumns[columnIndex];
+
+      const cardToMove = currentColumn.rows[rowIndex].cards.find(card => card.id === cardId);
+      if (!cardToMove) return prevColumns; // Card not found
+
+      // Toggle completed status
+      cardToMove.completed = !cardToMove.completed;
+
+      // Remove card from current row
+      currentColumn.rows[rowIndex].cards = currentColumn.rows[rowIndex].cards.filter(card => card.id !== cardId);
+
+      // Find the 'Done' row (assuming it's always the last row, index 2)
+      const doneRowIndex = currentColumn.rows.findIndex(row => row.title === 'Done');
+      if (doneRowIndex === -1) return prevColumns; // 'Done' row not found
+
+      // Add card to 'Done' row if completed, otherwise keep it in its current row
+      if (cardToMove.completed) {
+        currentColumn.rows[doneRowIndex].cards.push(cardToMove);
+      } else {
+        // If unchecking, put it back to its original row (or handle as per specific requirement)
+        // For now, we'll just leave it in the row it was unchecked from.
+        // A more complex solution might involve remembering its original row.
+        currentColumn.rows[rowIndex].cards.push(cardToMove);
+      }
+
       return newColumns;
     });
   };
@@ -187,6 +219,7 @@ const MainBoard = () => {
                           availableTags={availableTags}
                           addNewTag={addNewTag}
                           toggleCardPriority={toggleCardPriority}
+                          toggleCardCompleted={toggleCardCompleted}
                         />
                       ))}
                       <AddTaskButton columnId={column.id} rowIndex={rowIndex} />
