@@ -27,3 +27,10 @@
 *   **Data Consistency:** Ensured data consistency on initial load by marking cards in 'Done' rows as completed in `MainBoard.jsx`.
 *   **Drag and Drop Completion:** Ensured that dragging a card to a 'Done' row automatically updates its completion status in `MainBoard.jsx`.
 *   **Add Card Functionality:** Refactored 'Add Task' button to dynamically display an input field and save/cancel buttons upon click, improving user experience for adding new cards in `MainBoard.jsx`.
+
+## Session at 2025-07-05
+
+### Features
+
+*   **Card Completion Icon:** Replaced the checkbox for card completion with `CheckSquare` and `Square` icons for better visual representation.
+*   **Date Picker Functionality:** Made the calendar icon clickable to update the card's date, allowing for direct date selection.
