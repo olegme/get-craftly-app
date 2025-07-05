@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Flag, FlagOff } from 'lucide-react';
+import { Calendar, Flag, FlagOff, CheckSquare, Square } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted }) => {
+export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted, updateCardDate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -63,8 +63,20 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <input type="checkbox" checked={card.completed} onChange={() => toggleCardCompleted(card.id, columnId, rowIndex)} className="mt-1 rounded" />
-        
+        {
+          card.completed ? (
+            <CheckSquare
+              className="w-4 h-4 mr-1 text-green-500 cursor-pointer"
+              onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
+            />
+          ) : (
+            <Square
+              className="w-4 h-4 mr-1 text-gray-400 cursor-pointer"
+              onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
+            />
+          )
+        }
+
         <div className="flex items-center text-xs text-gray-500">
           {
             card.priority ? (
@@ -79,7 +91,9 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
               />
             )
           }
-          <Calendar className="w-3 h-3 mr-1" />
+        </div>
+        <div className="flex items-center text-xs text-gray-500 ml-auto">
+          <Calendar className="w-3 h-3 mr-1 cursor-pointer" onClick={() => updateCardDate(card.id, columnId, rowIndex, new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))} />
           {card.date}
         </div>
       </div>
