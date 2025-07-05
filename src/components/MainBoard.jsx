@@ -13,7 +13,6 @@ const MainBoard = () => {
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [laneToDelete, setLaneToDelete] = useState(null);
-  const [newCardTitle, setNewCardTitle] = useState('');
 
   useEffect(() => {
     getBoardData().then(data => {
