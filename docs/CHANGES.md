@@ -44,3 +44,5 @@
 *   **Firestore Data Modeling:** Created a test board document in Firestore with lanes, cards, and tags using `src/scripts/createTestBoard.js`.
 
 *   **Firestore API Layer:** Implemented board data access and manipulation functions in `src/api/board.js` (fetch, save, update, delete for boards, lanes, and cards).
+
+*   **Firestore API Integration:** Connected React board UI in `MainBoard.jsx` to Firestore API layer for live board, lane, and card updates.
