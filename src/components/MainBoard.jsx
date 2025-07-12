@@ -13,7 +13,6 @@ const MainBoard = () => {
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [laneToDelete, setLaneToDelete] = useState(null);
-  const [newCardTitle, setNewCardTitle] = useState('');
 
   useEffect(() => {
     getBoardData().then(data => {
@@ -336,6 +335,15 @@ const MainBoard = () => {
                           addNewTag={addNewTag}
                           toggleCardPriority={toggleCardPriority}
                           toggleCardCompleted={toggleCardCompleted}
+                          updateCardDate={(cardId, columnId, rowIndex, newDate) => {
+                            setColumns(prevColumns => {
+                              const newColumns = [...prevColumns];
+                              const columnIndex = newColumns.findIndex(col => col.id === columnId);
+                              const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
+                              newColumns[columnIndex].rows[rowIndex].cards[cardIndex].date = newDate;
+                              return newColumns;
+                            });
+                          }}
                         />
                       ))}
                       <AddTaskButton columnId={column.id} rowIndex={rowIndex} addCard={addCard} />
