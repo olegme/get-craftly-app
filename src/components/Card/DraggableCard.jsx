@@ -1,10 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Flag, FlagOff } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, Flag, FlagOff, CheckSquare, Square } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted }) => {
+export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted, updateCardDate }) => {
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(card.date ? parseDate(card.date) : null);
+
+  // Helper to parse date string in format 'Mon DD' or ISO
+  function parseDate(dateStr) {
+    if (!dateStr) return null;
+    // Try ISO first
+    const iso = Date.parse(dateStr);
+    if (!isNaN(iso)) return new Date(iso);
+    // Try 'Mon DD' (e.g. 'Jul 12')
+    const parts = dateStr.split(' ');
+    if (parts.length === 2) {
+      const month = parts[0];
+      const day = parseInt(parts[1], 10);
+      const year = new Date().getFullYear();
+      return new Date(`${month} ${day}, ${year}`);
+    }
+    return null;
+  }
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const inputRef = useRef(null);
@@ -63,8 +84,20 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <input type="checkbox" checked={card.completed} onChange={() => toggleCardCompleted(card.id, columnId, rowIndex)} className="mt-1 rounded" />
-        
+        {
+          card.completed ? (
+            <CheckSquare
+              className="w-4 h-4 mr-1 text-green-500 cursor-pointer"
+              onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
+            />
+          ) : (
+            <Square
+              className="w-4 h-4 mr-1 text-gray-400 cursor-pointer"
+              onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
+            />
+          )
+        }
+
         <div className="flex items-center text-xs text-gray-500">
           {
             card.priority ? (
@@ -79,8 +112,39 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
               />
             )
           }
-          <Calendar className="w-3 h-3 mr-1" />
-          {card.date}
+        </div>
+        <div className="flex items-center text-xs text-gray-500 ml-auto">
+          <Calendar className="w-3 h-3 mr-1 cursor-pointer" onClick={() => setShowCalendar(true)} />
+          <span className="cursor-pointer" onClick={() => setShowCalendar(true)}>{card.date}</span>
+          {showCalendar && (
+            <div style={{ position: 'fixed', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'white', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => {
+                  setSelectedDate(date);
+                  updateCardDate(card.id, columnId, rowIndex, date ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '');
+                  setShowCalendar(false);
+                }}
+                inline
+                isClearable
+                placeholderText="Select date"
+              />
+              <div className="flex justify-end mt-2 gap-2">
+                <button
+                  className="px-2 py-1 text-xs font-medium text-red-500 bg-gray-100 rounded hover:bg-gray-200"
+                  onClick={() => {
+                    setSelectedDate(null);
+                    updateCardDate(card.id, columnId, rowIndex, '');
+                    setShowCalendar(false);
+                  }}
+                >Clear</button>
+                <button
+                  className="px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded hover:bg-gray-200"
+                  onClick={() => setShowCalendar(false)}
+                >Close</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
