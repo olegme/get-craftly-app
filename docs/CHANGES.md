@@ -42,3 +42,5 @@
 
 *   **Firebase Integration:** Installed Firebase package, added Firebase config, and initialized Firestore in `src/firebase.js`.
 *   **Firestore Data Modeling:** Created a test board document in Firestore with lanes, cards, and tags using `src/scripts/createTestBoard.js`.
+
+*   **Firestore API Layer:** Implemented board data access and manipulation functions in `src/api/board.js` (fetch, save, update, delete for boards, lanes, and cards).
