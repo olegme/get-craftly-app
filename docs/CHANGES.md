@@ -28,9 +28,9 @@
 *   **Drag and Drop Completion:** Ensured that dragging a card to a 'Done' row automatically updates its completion status in `MainBoard.jsx`.
 *   **Add Card Functionality:** Refactored 'Add Task' button to dynamically display an input field and save/cancel buttons upon click, improving user experience for adding new cards in `MainBoard.jsx`.
 
-## Session at 2025-07-05
+
+## Session at 2025-07-12
 
 ### Features
 
-*   **Card Completion Icon:** Replaced the checkbox for card completion with `CheckSquare` and `Square` icons for better visual representation.
-*   **Date Picker Functionality:** Made the calendar icon clickable to update the card's date, allowing for direct date selection.
+*   **Calendar Pop-up for Card Date:** Added a calendar pop-up to cards for date selection and clearing. The date field now updates immediately when a date is picked or cleared. Fixed bug where date field was not updating due to missing prop in parent component.
