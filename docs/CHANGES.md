@@ -46,3 +46,7 @@
 *   **Firestore API Layer:** Implemented board data access and manipulation functions in `src/api/board.js` (fetch, save, update, delete for boards, lanes, and cards).
 
 *   **Firestore API Integration:** Connected React board UI in `MainBoard.jsx` to Firestore API layer for live board, lane, and card updates.
+
+### Security & Refactoring
+
+*   **Firebase Secrets Cleanup:** Moved all Firebase config values to `.env` and refactored `src/firebase.js` to use environment variables. Added `.env` and `src/firebase.js` to `.gitignore` for security.

@@ -15,7 +15,7 @@ import {
 } from '../api/board';
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
-const MainBoard = () => {
+const MainBoard = ({ user }) => {
   const [columns, setColumns] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -23,8 +23,9 @@ const MainBoard = () => {
 
   useEffect(() => {
     async function loadBoard() {
+      if (!user) return;
       try {
-        const data = await fetchBoard('test-board-1');
+        const data = await fetchBoard(user.uid);
         setColumns(data.lanes || []);
         setAvailableTags(data.tags || []);
       } catch (err) {
@@ -32,11 +33,11 @@ const MainBoard = () => {
       }
     }
     loadBoard();
-  }, []);
+  }, [user]);
 
   const addNewTag = async (newTag) => {
     setAvailableTags(prev => [...prev, newTag]);
-    await saveBoard('test-board-1', { tags: [...availableTags, newTag] });
+    if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] });
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
@@ -56,7 +57,7 @@ const MainBoard = () => {
       targetColumn.rows[targetRowIndex].cards.push(card);
       return newColumns;
     });
-    await saveBoard('test-board-1', { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns });
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
@@ -67,7 +68,7 @@ const MainBoard = () => {
       newColumns[columnIndex].rows[rowIndex].cards[cardIndex].title = newTitle;
       return newColumns;
     });
-    await updateCard('test-board-1', columnId, cardId, { title: newTitle });
+    await updateCard(user.uid, columnId, cardId, { title: newTitle });
   };
 
   const updateCardTags = async (cardId, columnId, rowIndex, newTags) => {
@@ -78,7 +79,7 @@ const MainBoard = () => {
       newColumns[columnIndex].rows[rowIndex].cards[cardIndex].tags = newTags;
       return newColumns;
     });
-    await updateCard('test-board-1', columnId, cardId, { tags: newTags });
+    await updateCard(user.uid, columnId, cardId, { tags: newTags });
   };
 
   const toggleCardPriority = async (cardId, columnId, rowIndex) => {
@@ -110,7 +111,7 @@ const MainBoard = () => {
       });
       return newColumns;
     });
-    await updateCard('test-board-1', columnId, cardId, { priority: true });
+    await updateCard(user.uid, columnId, cardId, { priority: true });
   };
 
   const toggleCardCompleted = async (cardId, columnId, rowIndex) => {
@@ -136,7 +137,7 @@ const MainBoard = () => {
       }
       return newColumns;
     });
-    await updateCard('test-board-1', columnId, cardId, { completed: true });
+    await updateCard(user.uid, columnId, cardId, { completed: true });
   };
 
   const updateColumnTitle = async (columnId, newTitle) => {
@@ -146,7 +147,7 @@ const MainBoard = () => {
       newColumns[columnIndex].title = newTitle;
       return newColumns;
     });
-    await updateLane('test-board-1', columnId, { title: newTitle });
+    await updateLane(user.uid, columnId, { title: newTitle });
   };
 
   const addLane = async (columnId) => {
@@ -161,7 +162,7 @@ const MainBoard = () => {
       newColumns.splice(columnIndex + 1, 0, newLane);
       return newColumns;
     });
-    await saveBoard('test-board-1', { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns });
   };
 
   const handleDeleteLane = (columnId) => {
@@ -217,7 +218,7 @@ const MainBoard = () => {
       });
       return newColumns;
     });
-    await addCardFirestore('test-board-1', columnId, newCard);
+    await addCardFirestore(user.uid, columnId, newCard);
   };
 
   const AddTaskButton = ({ columnId, rowIndex, addCard }) => {
