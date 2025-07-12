@@ -1,13 +1,29 @@
-import React from 'react';
-import './App.css'; // Ensure you import your main CSS file, which is App.css in this case
-
-// In your App.js or wherever you want to use it
+import React, { useEffect, useState } from 'react';
+import './App.css';
 import MainBoard from './components/MainBoard';
+import { signIn, signOutUser, onUserStateChanged } from './auth';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onUserStateChanged(setUser);
+    return () => unsubscribe();
+  }, []);
+
   return (
     <div className="App">
-      <MainBoard />
+      <header style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+        {user ? (
+          <>
+            <span style={{ marginRight: '1rem' }}>Signed in as {user.displayName}</span>
+            <button onClick={signOutUser}>Sign Out</button>
+          </>
+        ) : (
+          <button onClick={signIn}>Sign In with Google</button>
+        )}
+      </header>
+      {user && <MainBoard user={user} />}
     </div>
   );
 }
