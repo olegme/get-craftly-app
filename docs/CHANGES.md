@@ -1,3 +1,10 @@
+## 2025-07-12
+
+### Refactoring & Cleanup
+- Removed all console logging from MainBoard.jsx for a cleaner browser console.
+- Updated MainBoardWrapper to accept and forward the user prop.
+- Ensured all board saves set the owner field for correct Firestore permissions.
+- Minor export fix in firebase.js for consistent Firebase usage.
 # Changelog
 
 ## Session at 2025-06-28

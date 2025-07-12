@@ -16,20 +16,59 @@ import {
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
 const MainBoard = ({ user }) => {
+  // ...existing code...
   const [columns, setColumns] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [laneToDelete, setLaneToDelete] = useState(null);
 
   useEffect(() => {
+    // ...existing code...
     async function loadBoard() {
       if (!user) return;
+      // ...existing code...
       try {
         const data = await fetchBoard(user.uid);
+        // ...existing code...
         setColumns(data.lanes || []);
         setAvailableTags(data.tags || []);
+        // ...existing code...
       } catch (err) {
-        console.error('Error loading board:', err);
+        // Log error for debugging
+        // ...existing code...
+        // Robust missing board detection
+        if (
+          (err && err.message && err.message.toLowerCase().includes('board not found')) ||
+          (typeof err === 'string' && err.toLowerCase().includes('board not found'))
+        ) {
+          const defaultBoard = {
+            lanes: [
+              {
+                id: 'lane-1',
+                title: 'To Do',
+                rows: [
+                  { title: 'WIP', cards: [] },
+                  { title: 'Planned', cards: [] },
+                  { title: 'Done', cards: [] }
+                ]
+              }
+            ],
+            tags: []
+          };
+          // ...existing code...
+          await saveBoard(user.uid, defaultBoard, user.uid);
+          // Refetch board after creation to ensure UI updates with Firestore data
+          try {
+            const createdData = await fetchBoard(user.uid);
+            setColumns(createdData.lanes || []);
+            setAvailableTags(createdData.tags || []);
+            // ...existing code...
+          } catch (fetchErr) {
+            // ...existing code...
+            setColumns(defaultBoard.lanes);
+            setAvailableTags(defaultBoard.tags);
+          }
+        }
       }
     }
     loadBoard();
@@ -37,7 +76,7 @@ const MainBoard = ({ user }) => {
 
   const addNewTag = async (newTag) => {
     setAvailableTags(prev => [...prev, newTag]);
-    if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] });
+    if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] }, user.uid);
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
@@ -57,7 +96,7 @@ const MainBoard = ({ user }) => {
       targetColumn.rows[targetRowIndex].cards.push(card);
       return newColumns;
     });
-    await saveBoard(user.uid, { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns }, user.uid);
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
@@ -162,7 +201,7 @@ const MainBoard = ({ user }) => {
       newColumns.splice(columnIndex + 1, 0, newLane);
       return newColumns;
     });
-    await saveBoard(user.uid, { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns }, user.uid);
   };
 
   const handleDeleteLane = (columnId) => {
@@ -353,9 +392,9 @@ const MainBoard = ({ user }) => {
   );
 };
 
-const MainBoardWrapper = () => (
+const MainBoardWrapper = ({ user }) => (
   <DndProvider backend={HTML5Backend}>
-    <MainBoard />
+    <MainBoard user={user} />
   </DndProvider>
 );
 
