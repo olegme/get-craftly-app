@@ -5,7 +5,14 @@ import { Plus } from 'lucide-react';
 import { DraggableCard } from './Card/DraggableCard';
 import { DropZone } from './Board/DropZone';
 import { ColumnHeader } from './Board/ColumnHeader';
-import { getBoardData } from '../api/board';
+import {
+  fetchBoard,
+  saveBoard,
+  updateLane,
+  updateCard,
+  addCard as addCardFirestore,
+  deleteCard as deleteCardFirestore
+} from '../api/board';
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
 const MainBoard = () => {
@@ -15,60 +22,44 @@ const MainBoard = () => {
   const [laneToDelete, setLaneToDelete] = useState(null);
 
   useEffect(() => {
-    getBoardData().then(data => {
-      const correctedColumns = data.columns.map(column => ({
-        ...column,
-        rows: column.rows.map(row => {
-          if (row.title === 'Done') {
-            return {
-              ...row,
-              cards: row.cards.map(card => ({
-                ...card,
-                completed: true, // Ensure cards in 'Done' row are marked as completed
-              })),
-            };
-          }
-          return row;
-        }),
-      }));
-      setColumns(correctedColumns);
-      setAvailableTags(data.availableTags);
-    });
+    async function loadBoard() {
+      try {
+        const data = await fetchBoard('test-board-1');
+        setColumns(data.lanes || []);
+        setAvailableTags(data.tags || []);
+      } catch (err) {
+        console.error('Error loading board:', err);
+      }
+    }
+    loadBoard();
   }, []);
 
-  const addNewTag = (newTag) => {
+  const addNewTag = async (newTag) => {
     setAvailableTags(prev => [...prev, newTag]);
+    await saveBoard('test-board-1', { tags: [...availableTags, newTag] });
   };
 
-  const moveCard = (draggedCard, targetColumnId, targetRowIndex) => {
+  const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
     setColumns((prevColumns) => {
       const newColumns = JSON.parse(JSON.stringify(prevColumns));
-      
       const { sourceColumnId, sourceRowIndex } = draggedCard;
-
       const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
       const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
-
       if (!card) return prevColumns;
-
       sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
-      
       const targetColumn = newColumns.find(c => c.id === targetColumnId);
-      
-      // Update completed status based on target row
       if (targetColumn.rows[targetRowIndex].title === 'Done') {
         card.completed = true;
       } else {
         card.completed = false;
       }
-
       targetColumn.rows[targetRowIndex].cards.push(card);
-      
       return newColumns;
     });
+    await saveBoard('test-board-1', { lanes: columns });
   };
 
-  const updateCardTitle = (cardId, columnId, rowIndex, newTitle) => {
+  const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
     setColumns(prevColumns => {
       const newColumns = [...prevColumns];
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
@@ -76,9 +67,10 @@ const MainBoard = () => {
       newColumns[columnIndex].rows[rowIndex].cards[cardIndex].title = newTitle;
       return newColumns;
     });
+    await updateCard('test-board-1', columnId, cardId, { title: newTitle });
   };
 
-  const updateCardTags = (cardId, columnId, rowIndex, newTags) => {
+  const updateCardTags = async (cardId, columnId, rowIndex, newTags) => {
     setColumns(prevColumns => {
       const newColumns = [...prevColumns];
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
@@ -86,9 +78,10 @@ const MainBoard = () => {
       newColumns[columnIndex].rows[rowIndex].cards[cardIndex].tags = newTags;
       return newColumns;
     });
+    await updateCard('test-board-1', columnId, cardId, { tags: newTags });
   };
 
-  const toggleCardPriority = (cardId, columnId, rowIndex) => {
+  const toggleCardPriority = async (cardId, columnId, rowIndex) => {
     setColumns(prevColumns => {
       const newColumns = prevColumns.map(col => {
         if (col.id === columnId) {
@@ -117,50 +110,46 @@ const MainBoard = () => {
       });
       return newColumns;
     });
+    await updateCard('test-board-1', columnId, cardId, { priority: true });
   };
 
-  const toggleCardCompleted = (cardId, columnId, rowIndex) => {
+  const toggleCardCompleted = async (cardId, columnId, rowIndex) => {
     setColumns(prevColumns => {
       const newColumns = JSON.parse(JSON.stringify(prevColumns)); // Deep copy for easier manipulation
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       const currentColumn = newColumns[columnIndex];
-
       const cardToMove = currentColumn.rows[rowIndex].cards.find(card => card.id === cardId);
       if (!cardToMove) return prevColumns; // Card not found
-
       // Toggle completed status
       cardToMove.completed = !cardToMove.completed;
-
       // Remove card from current row
       currentColumn.rows[rowIndex].cards = currentColumn.rows[rowIndex].cards.filter(card => card.id !== cardId);
-
       // Find the 'Done' row (assuming it's always the last row, index 2)
       const doneRowIndex = currentColumn.rows.findIndex(row => row.title === 'Done');
       const wipRowIndex = currentColumn.rows.findIndex(row => row.title === 'WIP');
-
       if (doneRowIndex === -1 || wipRowIndex === -1) return prevColumns; // 'Done' or 'WIP' row not found
-
       // Add card to 'Done' row if completed, otherwise move to 'WIP' row
       if (cardToMove.completed) {
         currentColumn.rows[doneRowIndex].cards.push(cardToMove);
       } else {
         currentColumn.rows[wipRowIndex].cards.push(cardToMove);
       }
-
       return newColumns;
     });
+    await updateCard('test-board-1', columnId, cardId, { completed: true });
   };
 
-  const updateColumnTitle = (columnId, newTitle) => {
+  const updateColumnTitle = async (columnId, newTitle) => {
     setColumns(prevColumns => {
       const newColumns = [...prevColumns];
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       newColumns[columnIndex].title = newTitle;
       return newColumns;
     });
+    await updateLane('test-board-1', columnId, { title: newTitle });
   };
 
-  const addLane = (columnId) => {
+  const addLane = async (columnId) => {
     const newLane = {
       id: `new-lane-${Date.now()}`,
       title: 'New Lane',
@@ -172,6 +161,7 @@ const MainBoard = () => {
       newColumns.splice(columnIndex + 1, 0, newLane);
       return newColumns;
     });
+    await saveBoard('test-board-1', { lanes: columns });
   };
 
   const handleDeleteLane = (columnId) => {
@@ -197,9 +187,8 @@ const MainBoard = () => {
     setLaneToDelete(null);
   };
 
-  const addCard = (columnId, rowIndex, title) => {
+  const addCard = async (columnId, rowIndex, title) => {
     if (title.trim() === '') return;
-
     const newCard = {
       id: `card-${Date.now()}`,
       title: title,
@@ -208,7 +197,6 @@ const MainBoard = () => {
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       completed: false,
     };
-
     setColumns(prevColumns => {
       const newColumns = prevColumns.map(col => {
         if (col.id === columnId) {
@@ -229,6 +217,7 @@ const MainBoard = () => {
       });
       return newColumns;
     });
+    await addCardFirestore('test-board-1', columnId, newCard);
   };
 
   const AddTaskButton = ({ columnId, rowIndex, addCard }) => {
@@ -313,15 +302,13 @@ const MainBoard = () => {
                   addLane={() => addLane(column.id)}
                   deleteLane={() => handleDeleteLane(column.id)}
                 />
-                
-                {column.rows.map((row, rowIndex) => (
+                {(column.rows || []).map((row, rowIndex) => (
                   <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                         {row.title}
                       </span>
                     </div>
-                    
                     <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
                       {row.cards.map((card) => (
                         <DraggableCard 
