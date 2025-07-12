@@ -35,6 +35,7 @@ tailwindcss-stubs
 .env.local
 .env.development
 .env.production
+src/firebase.js
 
 # Dependency lock files
 package-lock.json

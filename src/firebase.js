@@ -1,16 +1,17 @@
 // src/firebase.js
+
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// Paste your Firebase config here from the Firebase Console
+// Firebase config from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyA0gYfg7qkKg5O3aviAlPldnwdGJR67G00",
-  authDomain: "get-craftly.firebaseapp.com",
-  projectId: "get-craftly",
-  storageBucket: "get-craftly.firebasestorage.app",
-  messagingSenderId: "240520915259",
-  appId: "1:240520915259:web:8d9f9cf76117f238686f1e",
-  measurementId: "G-675350SN84"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
