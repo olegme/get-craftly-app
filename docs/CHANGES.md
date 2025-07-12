@@ -34,3 +34,11 @@
 ### Features
 
 *   **Calendar Pop-up for Card Date:** Added a calendar pop-up to cards for date selection and clearing. The date field now updates immediately when a date is picked or cleared. Fixed bug where date field was not updating due to missing prop in parent component.
+
+
+## Session at 2025-07-12
+
+### Features
+
+*   **Firebase Integration:** Installed Firebase package, added Firebase config, and initialized Firestore in `src/firebase.js`.
+*   **Firestore Data Modeling:** Created a test board document in Firestore with lanes, cards, and tags using `src/scripts/createTestBoard.js`.
