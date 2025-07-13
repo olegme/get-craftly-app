@@ -177,7 +177,6 @@ const MainBoard = ({ user }) => {
   };
 
   const addLane = async (columnId) => {
-    console.log('MainBoard: Attempting to add new lane after column', columnId);
     const newLane = {
       id: `new-lane-${Date.now()}`,
       title: 'New Lane',
@@ -187,12 +186,9 @@ const MainBoard = ({ user }) => {
       const newColumns = [...prevColumns];
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       newColumns.splice(columnIndex + 1, 0, newLane);
-      console.log('MainBoard: Updated columns state with new lane', newColumns);
-      // Pass the updated newColumns directly to saveBoard
       saveBoard(user.uid, { lanes: newColumns }, user.uid);
       return newColumns;
     });
-    console.log('MainBoard: Board save initiated after adding new lane');
   };
 
   const handleDeleteLane = (columnId) => {
@@ -203,12 +199,20 @@ const MainBoard = ({ user }) => {
       setLaneToDelete(columnId);
       setDialogOpen(true);
     } else {
-      setColumns(prevColumns => prevColumns.filter(col => col.id !== columnId));
+      setColumns(prevColumns => {
+        const updatedColumns = prevColumns.filter(col => col.id !== columnId);
+        saveBoard(user.uid, { lanes: updatedColumns }, user.uid);
+        return updatedColumns;
+      });
     }
   };
 
   const confirmDelete = () => {
-    setColumns(prevColumns => prevColumns.filter(col => col.id !== laneToDelete));
+    setColumns(prevColumns => {
+      const updatedColumns = prevColumns.filter(col => col.id !== laneToDelete);
+      saveBoard(user.uid, { lanes: updatedColumns }, user.uid);
+      return updatedColumns;
+    });
     setDialogOpen(false);
     setLaneToDelete(null);
   };
