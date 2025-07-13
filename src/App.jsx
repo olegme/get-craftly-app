@@ -59,9 +59,9 @@ function App() {
             <button onClick={signOutUser}>Sign Out</button>
           </>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1rem' }}>
-            <button onClick={signIn}>Sign In with Google</button>
-            <button onClick={handleShowEmailModal} style={{ marginTop: '0.5rem', padding: '0.5rem', borderRadius: '4px', background: '#e5e7eb', color: '#2563eb', border: 'none', fontWeight: 'bold' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+            <button onClick={signIn} style={{ padding: '0.5rem', borderRadius: '4px', background: '#e5e7eb', color: '#2563eb', border: 'none', fontWeight: 'bold' }}>Sign In with Google</button>
+            <button onClick={handleShowEmailModal} style={{ padding: '0.5rem', borderRadius: '4px', background: '#e5e7eb', color: '#2563eb', border: 'none', fontWeight: 'bold' }}>
               Sign In with Email/Password
             </button>
             {showEmailModal && (

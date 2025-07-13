@@ -10,36 +10,27 @@ import {
   saveBoard,
   updateLane,
   updateCard,
-  addCard as addCardFirestore,
-  deleteCard as deleteCardFirestore
+  addCard as addCardFirestore
 } from '../api/board';
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
 const MainBoard = ({ user }) => {
-  // ...existing code...
   const [columns, setColumns] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [laneToDelete, setLaneToDelete] = useState(null);
 
   useEffect(() => {
-    // ...existing code...
     async function loadBoard() {
       if (!user) return;
-      // ...existing code...
       try {
         const data = await fetchBoard(user.uid);
-        // ...existing code...
         setColumns(data.lanes || []);
         setAvailableTags(data.tags || []);
-        // ...existing code...
-      } catch (err) {
-        // Log error for debugging
-        // ...existing code...
-        // Robust missing board detection
+      } catch (_err) {
         if (
-          (err && err.message && err.message.toLowerCase().includes('board not found')) ||
-          (typeof err === 'string' && err.toLowerCase().includes('board not found'))
+          (_err && _err.message && _err.message.toLowerCase().includes('board not found')) ||
+          (typeof _err === 'string' && _err.toLowerCase().includes('board not found'))
         ) {
           const defaultBoard = {
             lanes: [
@@ -55,16 +46,12 @@ const MainBoard = ({ user }) => {
             ],
             tags: []
           };
-          // ...existing code...
           await saveBoard(user.uid, defaultBoard, user.uid);
-          // Refetch board after creation to ensure UI updates with Firestore data
           try {
             const createdData = await fetchBoard(user.uid);
             setColumns(createdData.lanes || []);
             setAvailableTags(createdData.tags || []);
-            // ...existing code...
-          } catch (fetchErr) {
-            // ...existing code...
+          } catch {
             setColumns(defaultBoard.lanes);
             setAvailableTags(defaultBoard.tags);
           }
