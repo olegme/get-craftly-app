@@ -55,7 +55,7 @@ function App() {
       <header style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
         {user ? (
           <>
-            <span style={{ marginRight: '1rem' }}>Signed in as {user.displayName}</span>
+            <span style={{ marginRight: '1rem' }}>Signed in as {user.displayName || user.email}</span>
             <button onClick={signOutUser}>Sign Out</button>
           </>
         ) : (
