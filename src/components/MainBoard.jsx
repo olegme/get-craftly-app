@@ -177,6 +177,7 @@ const MainBoard = ({ user }) => {
   };
 
   const addLane = async (columnId) => {
+    console.log('MainBoard: Attempting to add new lane after column', columnId);
     const newLane = {
       id: `new-lane-${Date.now()}`,
       title: 'New Lane',
@@ -186,9 +187,12 @@ const MainBoard = ({ user }) => {
       const newColumns = [...prevColumns];
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       newColumns.splice(columnIndex + 1, 0, newLane);
+      console.log('MainBoard: Updated columns state with new lane', newColumns);
+      // Pass the updated newColumns directly to saveBoard
+      saveBoard(user.uid, { lanes: newColumns }, user.uid);
       return newColumns;
     });
-    await saveBoard(user.uid, { lanes: columns }, user.uid);
+    console.log('MainBoard: Board save initiated after adding new lane');
   };
 
   const handleDeleteLane = (columnId) => {

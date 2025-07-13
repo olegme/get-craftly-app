@@ -35,9 +35,11 @@ export async function fetchBoard(boardId) {
 
 // Create or update a board
 export async function saveBoard(boardId, boardData, ownerUid) {
+  console.log('Firestore: Saving board', { boardId, boardData, ownerUid });
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
   // Always set the owner field to the user's UID
   await setDoc(boardRef, { ...boardData, owner: ownerUid }, { merge: true });
+  console.log('Firestore: Board saved successfully', boardId);
 }
 
 // Delete a board
@@ -54,12 +56,17 @@ export async function listBoards() {
 
 // Update a lane in a board
 export async function updateLane(boardId, laneId, laneData) {
+  console.log('Firestore: Updating lane', { boardId, laneId, laneData });
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
   const boardSnap = await getDoc(boardRef);
-  if (!boardSnap.exists()) throw new Error('Board not found');
+  if (!boardSnap.exists()) {
+    console.error('Firestore: Board not found for updateLane', boardId);
+    throw new Error('Board not found');
+  }
   const board = boardSnap.data();
   const lanes = board.lanes.map(lane => lane.id === laneId ? { ...lane, ...laneData } : lane);
   await updateDoc(boardRef, { lanes });
+  console.log('Firestore: Lane updated successfully', { boardId, laneId });
 }
 
 // Update a card in a lane

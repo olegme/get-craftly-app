@@ -1,5 +1,13 @@
 ## 2025-07-13
 
+### Bug Fixes
+- Fixed display of "Signed in as" for email/password authenticated users in `src/App.jsx` by displaying `user.email` when `user.displayName` is not available.
+- Fixed issue where new lanes were not being saved to Firestore due to asynchronous state updates in `src/components/MainBoard.jsx`.
+
+### Refactoring & Cleanup
+- Added console logging for Firestore backend interactions related to saving new lanes in `src/api/board.js` and `src/components/MainBoard.jsx`.
+- Added console logging for `updateLane` function in `src/api/board.js` to track lane renames.
+
 ### Features
 - **Authentication and Firebase Integration:** Implemented Firebase authentication, including email/password and Google sign-in. Added registration, login, error display, and modal state handling.
 - **Environment Variables:** Moved Firebase secrets to `.env` and refactored `src/firebase.js` to use environment variables.
