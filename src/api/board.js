@@ -60,7 +60,7 @@ export async function updateLane(boardId, laneId, laneData) {
     throw new Error('Board not found');
   }
   const board = boardSnap.data();
-  const lanes = board.lanes.map(lane => lane.id === laneId ? { ...lane, ...laneData } : lane);
+  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane => lane.id === laneId ? { ...lane, ...laneData } : lane);
   await updateDoc(boardRef, { lanes });
 }
 
@@ -70,7 +70,7 @@ export async function updateCard(boardId, laneId, cardId, cardData) {
   const boardSnap = await getDoc(boardRef);
   if (!boardSnap.exists()) throw new Error('Board not found');
   const board = boardSnap.data();
-  const lanes = board.lanes.map(lane =>
+  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane =>
     lane.id === laneId
       ? { ...lane, cards: lane.cards.map(card => card.id === cardId ? { ...card, ...cardData } : card) }
       : lane
@@ -84,9 +84,9 @@ export async function addCard(boardId, laneId, cardData) {
   const boardSnap = await getDoc(boardRef);
   if (!boardSnap.exists()) throw new Error('Board not found');
   const board = boardSnap.data();
-  const lanes = board.lanes.map(lane =>
+  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane =>
     lane.id === laneId
-      ? { ...lane, cards: [...lane.cards, cardData] }
+      ? { ...lane, cards: [...(lane.cards || []), cardData] }
       : lane
   );
   await updateDoc(boardRef, { lanes });
@@ -98,7 +98,7 @@ export async function deleteCard(boardId, laneId, cardId) {
   const boardSnap = await getDoc(boardRef);
   if (!boardSnap.exists()) throw new Error('Board not found');
   const board = boardSnap.data();
-  const lanes = board.lanes.map(lane =>
+  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane =>
     lane.id === laneId
       ? { ...lane, cards: lane.cards.filter(card => card.id !== cardId) }
       : lane

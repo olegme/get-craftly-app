@@ -67,23 +67,27 @@ const MainBoard = ({ user }) => {
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
-    setColumns((prevColumns) => {
-      const newColumns = JSON.parse(JSON.stringify(prevColumns));
-      const { sourceColumnId, sourceRowIndex } = draggedCard;
-      const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
-      const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
-      if (!card) return prevColumns;
-      sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
-      const targetColumn = newColumns.find(c => c.id === targetColumnId);
-      if (targetColumn.rows[targetRowIndex].title === 'Done') {
-        card.completed = true;
-      } else {
-        card.completed = false;
-      }
-      targetColumn.rows[targetRowIndex].cards.push(card);
-      return newColumns;
-    });
-    await saveBoard(user.uid, { lanes: columns }, user.uid);
+    // Compute the new state first
+    const newColumns = JSON.parse(JSON.stringify(columns)); // Start with current columns state
+    const { sourceColumnId, sourceRowIndex } = draggedCard;
+    const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
+    const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
+    if (!card) return; // No card found, nothing to do
+
+    sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
+    const targetColumn = newColumns.find(c => c.id === targetColumnId);
+    if (targetColumn.rows[targetRowIndex].title === 'Done') {
+      card.completed = true;
+    } else {
+      card.completed = false;
+    }
+    targetColumn.rows[targetRowIndex].cards.push(card);
+
+    // Update the state
+    setColumns(newColumns);
+
+    // Now save the board with the newColumns
+    await saveBoard(user.uid, { lanes: newColumns }, user.uid);
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
@@ -137,7 +141,8 @@ const MainBoard = ({ user }) => {
       });
       return newColumns;
     });
-    await updateCard(user.uid, columnId, cardId, { priority: true });
+    const updatedPriority = newColumns.find(col => col.id === columnId).rows[rowIndex].cards.find(card => card.id === cardId).priority;
+    await updateCard(user.uid, columnId, cardId, { priority: updatedPriority });
   };
 
   const toggleCardCompleted = async (cardId, columnId, rowIndex) => {
@@ -163,7 +168,7 @@ const MainBoard = ({ user }) => {
       }
       return newColumns;
     });
-    await updateCard(user.uid, columnId, cardId, { completed: true });
+    await updateCard(user.uid, columnId, cardId, { completed: cardToMove.completed });
   };
 
   const updateColumnTitle = async (columnId, newTitle) => {
@@ -357,7 +362,7 @@ const MainBoard = ({ user }) => {
                           addNewTag={addNewTag}
                           toggleCardPriority={toggleCardPriority}
                           toggleCardCompleted={toggleCardCompleted}
-                          updateCardDate={(cardId, columnId, rowIndex, newDate) => {
+                          updateCardDate={async (cardId, columnId, rowIndex, newDate) => {
                             setColumns(prevColumns => {
                               const newColumns = [...prevColumns];
                               const columnIndex = newColumns.findIndex(col => col.id === columnId);
@@ -365,6 +370,7 @@ const MainBoard = ({ user }) => {
                               newColumns[columnIndex].rows[rowIndex].cards[cardIndex].date = newDate;
                               return newColumns;
                             });
+                            await updateCard(user.uid, columnId, cardId, { date: newDate });
                           }}
                         />
                       ))}
