@@ -10,8 +10,7 @@ import {
   saveBoard,
   updateLane,
   updateCard,
-  addCard as addCardFirestore,
-  deleteCard as deleteCardFirestore
+  addCard as addCardFirestore
 } from '../api/board';
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
@@ -28,8 +27,35 @@ const MainBoard = ({ user }) => {
         const data = await fetchBoard(user.uid);
         setColumns(data.lanes || []);
         setAvailableTags(data.tags || []);
-      } catch (err) {
-        console.error('Error loading board:', err);
+      } catch (_err) {
+        if (
+          (_err && _err.message && _err.message.toLowerCase().includes('board not found')) ||
+          (typeof _err === 'string' && _err.toLowerCase().includes('board not found'))
+        ) {
+          const defaultBoard = {
+            lanes: [
+              {
+                id: 'lane-1',
+                title: 'To Do',
+                rows: [
+                  { title: 'WIP', cards: [] },
+                  { title: 'Planned', cards: [] },
+                  { title: 'Done', cards: [] }
+                ]
+              }
+            ],
+            tags: []
+          };
+          await saveBoard(user.uid, defaultBoard, user.uid);
+          try {
+            const createdData = await fetchBoard(user.uid);
+            setColumns(createdData.lanes || []);
+            setAvailableTags(createdData.tags || []);
+          } catch {
+            setColumns(defaultBoard.lanes);
+            setAvailableTags(defaultBoard.tags);
+          }
+        }
       }
     }
     loadBoard();
@@ -37,7 +63,7 @@ const MainBoard = ({ user }) => {
 
   const addNewTag = async (newTag) => {
     setAvailableTags(prev => [...prev, newTag]);
-    if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] });
+    if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] }, user.uid);
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
@@ -57,7 +83,7 @@ const MainBoard = ({ user }) => {
       targetColumn.rows[targetRowIndex].cards.push(card);
       return newColumns;
     });
-    await saveBoard(user.uid, { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns }, user.uid);
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
@@ -162,7 +188,7 @@ const MainBoard = ({ user }) => {
       newColumns.splice(columnIndex + 1, 0, newLane);
       return newColumns;
     });
-    await saveBoard(user.uid, { lanes: columns });
+    await saveBoard(user.uid, { lanes: columns }, user.uid);
   };
 
   const handleDeleteLane = (columnId) => {
@@ -353,9 +379,9 @@ const MainBoard = ({ user }) => {
   );
 };
 
-const MainBoardWrapper = () => (
+const MainBoardWrapper = ({ user }) => (
   <DndProvider backend={HTML5Backend}>
-    <MainBoard />
+    <MainBoard user={user} />
   </DndProvider>
 );
 

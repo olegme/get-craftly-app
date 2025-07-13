@@ -14,16 +14,30 @@ const BOARD_COLLECTION = 'boards';
 
 // Fetch a board by ID
 export async function fetchBoard(boardId) {
+  
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
-  const snap = await getDoc(boardRef);
-  if (!snap.exists()) throw new Error('Board not found');
-  return snap.data();
+  let snap;
+  try {
+    snap = await getDoc(boardRef);
+    
+  } catch (err) {
+    console.error('getDoc threw error for boardId:', boardId, err);
+    throw err;
+  }
+  if (!snap.exists()) {
+    console.warn('Board does not exist for boardId:', boardId);
+    throw new Error('Board not found');
+  }
+  const data = snap.data();
+ 
+  return data;
 }
 
 // Create or update a board
-export async function saveBoard(boardId, boardData) {
+export async function saveBoard(boardId, boardData, ownerUid) {
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
-  await setDoc(boardRef, boardData, { merge: true });
+  // Always set the owner field to the user's UID
+  await setDoc(boardRef, { ...boardData, owner: ownerUid }, { merge: true });
 }
 
 // Delete a board
