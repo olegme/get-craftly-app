@@ -1,9 +1,8 @@
 ## 2025-07-13
 
 ### Bug Fixes
-- Fixed display of "Signed in as" for email/password authenticated users in `src/App.jsx` by displaying `user.email` when `user.displayName` is not available.
-- Fixed issue where new lanes were not being saved to Firestore due to asynchronous state updates in `src/components/MainBoard.jsx`.
-- Implemented confirmation dialog for lane deletion and ensured changes are saved to Firestore in `src/components/MainBoard.jsx`.
+- Fixed issue where new cards were not being saved to Firestore by ensuring the local state update in `src/components/MainBoard.jsx` correctly places the new card in the respective row and passing the updated state directly to `src/api/board.js` for persistence.
+- Removed debug logging from `src/api/board.js`.
 
 ### Refactoring & Cleanup
 - Removed all debug logging from `src/api/board.js` and `src/components/MainBoard.jsx`.
