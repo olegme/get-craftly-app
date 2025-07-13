@@ -14,12 +14,12 @@ const BOARD_COLLECTION = 'boards';
 
 // Fetch a board by ID
 export async function fetchBoard(boardId) {
-  console.log('fetchBoard called with boardId:', boardId);
+  
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
   let snap;
   try {
     snap = await getDoc(boardRef);
-    console.log('getDoc resolved for boardId:', boardId, 'exists:', snap.exists());
+    
   } catch (err) {
     console.error('getDoc threw error for boardId:', boardId, err);
     throw err;
@@ -29,7 +29,7 @@ export async function fetchBoard(boardId) {
     throw new Error('Board not found');
   }
   const data = snap.data();
-  console.log('Board data for boardId:', boardId, data);
+ 
   return data;
 }
 
