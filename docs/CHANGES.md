@@ -79,3 +79,13 @@
 ### Security & Refactoring
 
 *   **Firebase Secrets Cleanup:** Moved all Firebase config values to `.env` and refactored `src/firebase.js` to use environment variables. Added `.env` and `src/firebase.js` to `.gitignore` for security.
+
+## 2025-07-13
+
+### Bug Fixes
+- Ensured `moveCard` in `src/components/MainBoard.jsx` uses the latest column data for persistence.
+- Corrected `toggleCardPriority` in `src/components/MainBoard.jsx` to pass the actual priority value to the backend.
+- Corrected `toggleCardCompleted` in `src/components/MainBoard.jsx` to pass the actual completed status to the backend.
+- Added persistence for date changes in `updateCardDate` within `src/components/MainBoard.jsx`.
+- Fixed `TypeError: lane.cards is not iterable` in `src/api/board.js` by ensuring `lane.cards` is always an array before iteration.
+- Fixed `TypeError: board.lanes is not iterable` in `src/api/board.js` by ensuring `board.lanes` is always an array before iteration.
