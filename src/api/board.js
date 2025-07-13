@@ -79,17 +79,9 @@ export async function updateCard(boardId, laneId, cardId, cardData) {
 }
 
 // Add a new card to a lane
-export async function addCard(boardId, laneId, cardData) {
+export async function addCard(boardId, laneId, cardData, updatedLanes) {
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
-  const boardSnap = await getDoc(boardRef);
-  if (!boardSnap.exists()) throw new Error('Board not found');
-  const board = boardSnap.data();
-  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane =>
-    lane.id === laneId
-      ? { ...lane, cards: [...(lane.cards || []), cardData] }
-      : lane
-  );
-  await updateDoc(boardRef, { lanes });
+  await updateDoc(boardRef, { lanes: updatedLanes });
 }
 
 // Delete a card from a lane
