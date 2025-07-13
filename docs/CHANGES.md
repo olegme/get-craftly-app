@@ -1,5 +1,11 @@
 ## 2025-07-13
 
+### Features
+- **Authentication and Firebase Integration:** Implemented Firebase authentication, including email/password and Google sign-in. Added registration, login, error display, and modal state handling.
+- **Environment Variables:** Moved Firebase secrets to `.env` and refactored `src/firebase.js` to use environment variables.
+- **Board Ownership:** Updated board ownership logic.
+- **UI/UX:** Aligned sign-in buttons and fixed linting errors.
+
 ### UI Enhancements
 - Aligned the 'Sign In' buttons in a row and applied a consistent style for a cleaner look in `src/App.jsx`.
 
