@@ -1,3 +1,11 @@
+## 2025-07-13
+
+### UI Enhancements
+- Aligned the 'Sign In' buttons in a row and applied a consistent style for a cleaner look in `src/App.jsx`.
+
+### Bug Fixes
+- Resolved multiple linting errors in `src/components/MainBoard.jsx` that were preventing the application from building successfully.
+
 ## 2025-07-12
 
 ### Refactoring & Cleanup
