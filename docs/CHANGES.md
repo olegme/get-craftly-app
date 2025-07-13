@@ -1,5 +1,8 @@
 ## 2025-07-13
 
+### Bug Fixes
+- Fixed display of "Signed in as" for email/password authenticated users in `src/App.jsx` by displaying `user.email` when `user.displayName` is not available.
+
 ### Features
 - **Authentication and Firebase Integration:** Implemented Firebase authentication, including email/password and Google sign-in. Added registration, login, error display, and modal state handling.
 - **Environment Variables:** Moved Firebase secrets to `.env` and refactored `src/firebase.js` to use environment variables.
