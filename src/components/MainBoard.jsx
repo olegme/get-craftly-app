@@ -237,27 +237,26 @@ const MainBoard = ({ user }) => {
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       completed: false,
     };
-    setColumns(prevColumns => {
-      const newColumns = prevColumns.map(col => {
-        if (col.id === columnId) {
-          return {
-            ...col,
-            rows: col.rows.map((row, rIdx) => {
-              if (rIdx === rowIndex) {
-                return {
-                  ...row,
-                  cards: [...row.cards, newCard],
-                };
-              }
-              return row;
-            }),
-          };
-        }
-        return col;
-      });
-      return newColumns;
+    const newColumns = columns.map(col => {
+      if (col.id === columnId) {
+        const updatedRows = col.rows.map((row, rIdx) => {
+          if (rIdx === rowIndex) {
+            return {
+              ...row,
+              cards: [...row.cards, newCard],
+            };
+          }
+          return row;
+        });
+        return {
+          ...col,
+          rows: updatedRows,
+        };
+      }
+      return col;
     });
-    await addCardFirestore(user.uid, columnId, newCard);
+    setColumns(newColumns);
+    await addCardFirestore(user.uid, columnId, newCard, newColumns);
   };
 
   const AddTaskButton = ({ columnId, rowIndex, addCard }) => {
