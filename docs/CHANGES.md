@@ -1,3 +1,24 @@
+## 2025-07-13
+
+### Features
+- **Authentication and Firebase Integration:** Implemented Firebase authentication, including email/password and Google sign-in. Added registration, login, error display, and modal state handling.
+- **Environment Variables:** Moved Firebase secrets to `.env` and refactored `src/firebase.js` to use environment variables.
+- **Board Ownership:** Updated board ownership logic.
+- **UI/UX:** Aligned sign-in buttons and fixed linting errors.
+
+### UI Enhancements
+- Aligned the 'Sign In' buttons in a row and applied a consistent style for a cleaner look in `src/App.jsx`.
+
+### Bug Fixes
+- Resolved multiple linting errors in `src/components/MainBoard.jsx` that were preventing the application from building successfully.
+
+## 2025-07-12
+
+### Refactoring & Cleanup
+- Removed all console logging from MainBoard.jsx for a cleaner browser console.
+- Updated MainBoardWrapper to accept and forward the user prop.
+- Ensured all board saves set the owner field for correct Firestore permissions.
+- Minor export fix in firebase.js for consistent Firebase usage.
 # Changelog
 
 ## Session at 2025-06-28
