@@ -1,14 +1,14 @@
-# Rules to follow on every task
-
-- After each completed task run build process to make sure there are no syntax errors. If working on an Angular project, use 'ng build -c development' command for build.
-
-- After finishing a task, wait for my explicit confirmation, summaries the changes made and add an entry to CHANGES.md with a timestamp. Then wait for my explicit order and after my direct order commit the changes.
-
-- Use 'gh' command line tool to interact with GitHub to manage issues. You are allowed to manage issues without my permission.
-- Never ever commit to git without my explicit permission.
-- After any change run linting, but don't run the application unless explicitly commanded to to so
-
-After we worked on a task, wait for my confirmation that the changes are accepted and the application runs without issues. After that add a short summary of the made changes to @docs/CHANGES.md and commit current git branch.
+# Advanced workflow
+- When I ask you to fix a new issue, follow the below steps:
+1. Ask me for an issue description and create a git issue with that title using the 'gh' command
+2. Create and check-out a local branch, name it in a clever way to reflect the issue title
+3. Fix the issue. Work on it until I confirmed the issue is resolved.
+4. Run build process to make sure there are no syntax errors. If working on an Angular project, use 'ng build -c development' command for build.
+5. Summarise all changes that are not yet commited and add a short summary to @docs/CHANGES.md with a timestamp. 
+6. Stage @docs/CHANGES.md for commit as well. 
+7. Ask me for permission to commit, commit to git if I cofirm.
+8. Upload the changes to the remote
+9. Create a pull request, make sure to add a comment, which will also close the respective issue.
 
 ## Agent Guidelines for Windows Environment
 
