@@ -1,5 +1,8 @@
 ## 2025-07-14
 
+### Features
+- **Deployment:** Deployed the application to Firebase Hosting, making it accessible online.
+
 ### Bug Fixes
 - Set the default date for new cards to empty instead of the current date.
 - Fixed a bug that prevented card date changes from being saved to Firestore.
