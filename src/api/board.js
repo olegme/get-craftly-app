@@ -70,11 +70,21 @@ export async function updateCard(boardId, laneId, cardId, cardData) {
   const boardSnap = await getDoc(boardRef);
   if (!boardSnap.exists()) throw new Error('Board not found');
   const board = boardSnap.data();
-  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane =>
-    lane.id === laneId
-      ? { ...lane, cards: lane.cards.map(card => card.id === cardId ? { ...card, ...cardData } : card) }
-      : lane
-  );
+  const lanes = (Array.isArray(board.lanes) ? board.lanes : []).map(lane => {
+    if (lane.id === laneId) {
+      const newRows = (lane.rows || []).map(row => {
+        const newCards = (row.cards || []).map(card => {
+          if (card.id === cardId) {
+            return { ...card, ...cardData };
+          }
+          return card;
+        });
+        return { ...row, cards: newCards };
+      });
+      return { ...lane, rows: newRows };
+    }
+    return lane;
+  });
   await updateDoc(boardRef, { lanes });
 }
 

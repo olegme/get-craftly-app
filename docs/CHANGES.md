@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 - Set the default date for new cards to empty instead of the current date.
+- Fixed a bug that prevented card date changes from being saved to Firestore.
+- Fixed linting errors in `src/components/MainBoard.jsx`.
 
 ## 2025-07-13
 
