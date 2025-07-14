@@ -7,6 +7,7 @@
 - Set the default date for new cards to empty instead of the current date.
 - Fixed a bug that prevented card date changes from being saved to Firestore.
 - Fixed linting errors in `src/components/MainBoard.jsx`.
+- **Styling:** Restored Tailwind CSS import in `src/App.css` to fix missing styles.
 
 ### Refactoring & Cleanup
 - Moved inline styles from `src/App.jsx` to `src/App.css`.
