@@ -1,50 +1,102 @@
-/* src/App.css */
-@import "tailwindcss";
-/* You can add your custom global styles below */
-body {
-  font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-#root {
-  width: 100%;
-  margin: 0;
+/* App.css */
+
+.app-header {
+  display: flex;
+  justify-content: flex-end;
   padding: 1rem;
-  text-align: left;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.user-info {
+  margin-right: 1rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.auth-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.auth-button {
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #e5e7eb;
+  color: #2563eb;
+  border: none;
+  font-weight: bold;
 }
 
-.card {
-  padding: 2em;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.read-the-docs {
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  min-width: 300px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
   color: #888;
+  cursor: pointer;
+}
+
+.modal-title {
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #2563eb;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.submit-button {
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.95rem;
+  text-align: center;
 }
