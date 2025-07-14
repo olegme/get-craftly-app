@@ -141,8 +141,8 @@ const MainBoard = ({ user }) => {
       });
       return newColumns;
     });
-    const updatedPriority = newColumns.find(col => col.id === columnId).rows[rowIndex].cards.find(card => card.id === cardId).priority;
-    await updateCard(user.uid, columnId, cardId, { priority: updatedPriority });
+    const card = columns.find(col => col.id === columnId).rows[rowIndex].cards.find(c => c.id === cardId);
+    await updateCard(user.uid, columnId, cardId, { priority: !card.priority });
   };
 
   const toggleCardCompleted = async (cardId, columnId, rowIndex) => {
@@ -168,7 +168,8 @@ const MainBoard = ({ user }) => {
       }
       return newColumns;
     });
-    await updateCard(user.uid, columnId, cardId, { completed: cardToMove.completed });
+    const card = columns.find(col => col.id === columnId).rows[rowIndex].cards.find(c => c.id === cardId);
+    await updateCard(user.uid, columnId, cardId, { completed: !card.completed });
   };
 
   const updateColumnTitle = async (columnId, newTitle) => {
