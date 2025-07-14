@@ -5,6 +5,11 @@
 - Fixed a bug that prevented card date changes from being saved to Firestore.
 - Fixed linting errors in `src/components/MainBoard.jsx`.
 
+### Refactoring & Cleanup
+- Moved inline styles from `src/App.jsx` to `src/App.css`.
+- Moved inline styles from `src/components/Card/DraggableCard.jsx` to `src/components/Card/DraggableCard.css`.
+- Removed redundant inline style from `src/components/MainBoard.jsx`.
+
 ## 2025-07-13
 
 ### Bug Fixes

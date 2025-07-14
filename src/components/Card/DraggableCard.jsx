@@ -5,6 +5,7 @@ import { Calendar, Flag, FlagOff, CheckSquare, Square } from 'lucide-react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from './ItemTypes';
 import { Tags } from './Tags';
+import './DraggableCard.css';
 
 export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted, updateCardDate }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -117,7 +118,7 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
           <Calendar className="w-3 h-3 mr-1 cursor-pointer" onClick={() => setShowCalendar(true)} />
           <span className="cursor-pointer" onClick={() => setShowCalendar(true)}>{card.date}</span>
           {showCalendar && (
-            <div style={{ position: 'fixed', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'white', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+            <div className="calendar-modal">
               <DatePicker
                 selected={selectedDate}
                 onChange={(date) => {

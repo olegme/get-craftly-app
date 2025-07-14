@@ -332,7 +332,7 @@ const MainBoard = ({ user }) => {
   return (
     <>
       <div className="min-h-screen bg-gray-50 p-6">
-        <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start" style={{display: 'flex', justifyContent: 'center'}}>
+        <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start">
           {columns.map((column) => (
             <div key={column.id} className="flex-shrink-0 w-80">
               <div className="bg-gray-100 rounded-lg p-4">

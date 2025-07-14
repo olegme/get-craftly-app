@@ -52,42 +52,31 @@ function App() {
 
   return (
     <div className="App">
-      <header style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem' }}>
+      <header className="app-header">
         {user ? (
           <>
-            <span style={{ marginRight: '1rem' }}>Signed in as {user.displayName || user.email}</span>
+            <span className="user-info">Signed in as {user.displayName || user.email}</span>
             <button onClick={signOutUser}>Sign Out</button>
           </>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={signIn} style={{ padding: '0.5rem', borderRadius: '4px', background: '#e5e7eb', color: '#2563eb', border: 'none', fontWeight: 'bold' }}>Sign In with Google</button>
-            <button onClick={handleShowEmailModal} style={{ padding: '0.5rem', borderRadius: '4px', background: '#e5e7eb', color: '#2563eb', border: 'none', fontWeight: 'bold' }}>
+          <div className="auth-buttons">
+            <button onClick={signIn} className="auth-button">Sign In with Google</button>
+            <button onClick={handleShowEmailModal} className="auth-button">
               Sign In with Email/Password
             </button>
             {showEmailModal && (
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                background: 'rgba(0,0,0,0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000
-              }}>
-                <div style={{ background: 'white', padding: '2rem', borderRadius: '8px', minWidth: '300px', boxShadow: '0 2px 16px rgba(0,0,0,0.15)', position: 'relative' }}>
-                  <button onClick={handleCloseEmailModal} style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', fontSize: '1.5rem', color: '#888', cursor: 'pointer' }}>&times;</button>
-                  <h2 style={{ marginBottom: '1rem', textAlign: 'center', color: '#2563eb' }}>{isRegister ? 'Register' : 'Login'}</h2>
-                  <form onSubmit={handleEmailPasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div className="modal-overlay">
+                <div className="modal-content">
+                  <button onClick={handleCloseEmailModal} className="close-button">&times;</button>
+                  <h2 className="modal-title">{isRegister ? 'Register' : 'Login'}</h2>
+                  <form onSubmit={handleEmailPasswordSubmit} className="auth-form">
                     <input
                       type="email"
                       placeholder="Email"
                       value={email}
                       onChange={handleEmailChange}
                       required
-                      style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                      className="auth-input"
                     />
                     <input
                       type="password"
@@ -95,15 +84,15 @@ function App() {
                       value={password}
                       onChange={handlePasswordChange}
                       required
-                      style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                      className="auth-input"
                     />
-                    <button type="submit" style={{ padding: '0.5rem', borderRadius: '4px', background: '#2563eb', color: 'white', border: 'none', fontWeight: 'bold' }}>
+                    <button type="submit" className="submit-button">
                       {isRegister ? 'Register' : 'Login'}
                     </button>
-                    <button type="button" onClick={handleToggleRegister} style={{ background: 'none', border: 'none', color: '#2563eb', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.95rem' }}>
+                    <button type="button" onClick={handleToggleRegister} className="toggle-button">
                       {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
                     </button>
-                    {error && <span style={{ color: 'red', fontSize: '0.95rem', textAlign: 'center' }}>{error}</span>}
+                    {error && <span className="error-message">{error}</span>}
                   </form>
                 </div>
               </div>
