@@ -234,7 +234,7 @@ const MainBoard = ({ user }) => {
       title: title,
       priority: false,
       tags: [],
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: '',
       completed: false,
     };
     const newColumns = columns.map(col => {
