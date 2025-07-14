@@ -1,3 +1,8 @@
+## 2025-07-14
+
+### Bug Fixes
+- Set the default date for new cards to empty instead of the current date.
+
 ## 2025-07-13
 
 ### Bug Fixes
