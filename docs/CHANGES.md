@@ -1,3 +1,8 @@
+## 2025-07-22
+
+### Features
+- **Deployment:** Added a new npm script to automate the deployment process and create a git tag on each successful deployment.
+
 ## 2025-07-14
 
 ### Features
