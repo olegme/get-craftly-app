@@ -3,6 +3,9 @@
 ### Features
 - **Deployment:** Added a new npm script to automate the deployment process and create a git tag on each successful deployment.
 
+### Revert
+- Reverted changes related to the new color scheme and UI fixes.
+
 ## 2025-07-14
 
 ### Features
