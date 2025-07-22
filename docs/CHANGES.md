@@ -1,11 +1,7 @@
 ## 2025-07-22
 
 ### Features
-- **UI:** Implemented a new color scheme to make the application more visually appealing.
 - **Deployment:** Added a new npm script to automate the deployment process and create a git tag on each successful deployment.
-
-### Bug Fixes
-- **UI:** Fixed an issue where the 'Add Task' button was not visible against the new background color.
 
 ## 2025-07-14
 

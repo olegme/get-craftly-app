@@ -287,7 +287,7 @@ const MainBoard = ({ user }) => {
           <>
             <input
               type="text"
-              className="w-full p-2 border border-gray-700 bg-secondary rounded-md mb-2 text-sm text-text-primary"
+              className="w-full p-2 border border-gray-300 rounded-md mb-2 text-sm"
               placeholder="New card title"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
@@ -304,13 +304,13 @@ const MainBoard = ({ user }) => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleSaveTask}
-                className="px-3 py-1 text-xs font-medium text-white bg-highlight rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Add
               </button>
               <button
                 onClick={handleCancel}
-                className="px-3 py-1 text-xs font-medium text-gray-300 bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 Cancel
               </button>
@@ -318,7 +318,7 @@ const MainBoard = ({ user }) => {
           </>
         ) : (
           <button
-            className="w-full p-2 text-left text-gray-800 bg-gray-300 hover:bg-gray-400 rounded-lg transition-colors flex items-center"
+            className="w-full p-2 text-left text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center"
             onClick={handleAddTaskClick}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -331,11 +331,11 @@ const MainBoard = ({ user }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-primary p-6">
+      <div className="min-h-screen bg-gray-50 p-6">
         <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start">
           {columns.map((column) => (
             <div key={column.id} className="flex-shrink-0 w-80">
-              <div className="bg-secondary rounded-lg p-4">
+              <div className="bg-gray-100 rounded-lg p-4">
                 <ColumnHeader 
                   title={column.title} 
                   updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
@@ -343,9 +343,9 @@ const MainBoard = ({ user }) => {
                   deleteLane={() => handleDeleteLane(column.id)}
                 />
                 {(column.rows || []).map((row, rowIndex) => (
-                  <div key={rowIndex} className="mb-6 bg-accent rounded-lg border border-gray-700 p-3">
+                  <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-highlight uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                         {row.title}
                       </span>
                     </div>
