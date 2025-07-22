@@ -5,6 +5,8 @@ body {
   font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #1a202c;
+  color: #ffffff;
 }
 #root {
   width: 100%;
