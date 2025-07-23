@@ -309,6 +309,15 @@ const MainBoard = ({ user }) => {
 
   const addCard = async (columnId, rowIndex, title) => {
     if (title.trim() === '') return;
+    // Get the column color
+    const column = columns.find(col => col.id === columnId);
+    const columnColor = column && column.color;
+    // Get all muted colors except the column color
+    const availableColors = mutedColors.filter(c => c !== columnColor);
+    // Pick a random color for the card
+    const cardColor = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : mutedColors[Math.floor(Math.random() * mutedColors.length)];
     const newCard = {
       id: `card-${Date.now()}`,
       title: title,
@@ -316,6 +325,7 @@ const MainBoard = ({ user }) => {
       tags: [],
       date: '',
       completed: false,
+      color: cardColor,
     };
     const newColumns = columns.map(col => {
       if (col.id === columnId) {

@@ -2,6 +2,7 @@
 
 ### Features
 - **Styling:** Implemented a colorful design where each column on the board is assigned a unique, muted color for better visual organization.
+- **Styling:** Each new card is now assigned a random muted color, distinct from the color of the column it belongs to.
 
 ## 2025-07-22
 
