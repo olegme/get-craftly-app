@@ -15,6 +15,36 @@ import {
 import { ConfirmationDialog } from './Board/ConfirmationDialog';
 
 const MainBoard = ({ user }) => {
+  // Muted color palette
+  const mutedColors = [
+    'bg-yellow-50', 'bg-yellow-100', 'bg-yellow-200',
+    'bg-green-50', 'bg-green-100', 'bg-green-200',
+    'bg-blue-50', 'bg-blue-100', 'bg-blue-200',
+    'bg-purple-50', 'bg-purple-100', 'bg-purple-200',
+    'bg-pink-50', 'bg-pink-100', 'bg-pink-200',
+    'bg-orange-50', 'bg-orange-100', 'bg-orange-200',
+    'bg-teal-50', 'bg-teal-100', 'bg-teal-200',
+    'bg-lime-50', 'bg-lime-100', 'bg-lime-200',
+    'bg-rose-50', 'bg-rose-100', 'bg-rose-200',
+    'bg-indigo-50', 'bg-indigo-100', 'bg-indigo-200',
+    'bg-cyan-50', 'bg-cyan-100', 'bg-cyan-200',
+    'bg-emerald-50', 'bg-emerald-100', 'bg-emerald-200',
+    'bg-fuchsia-50', 'bg-fuchsia-100', 'bg-fuchsia-200',
+    'bg-sky-50', 'bg-sky-100', 'bg-sky-200',
+    'bg-violet-50', 'bg-violet-100', 'bg-violet-200',
+    'bg-red-50', 'bg-red-100', 'bg-red-200',
+    'bg-gray-50', 'bg-gray-100', 'bg-gray-200',
+    'bg-stone-50', 'bg-stone-100', 'bg-stone-200',
+    'bg-zinc-50', 'bg-zinc-100', 'bg-zinc-200',
+    'bg-neutral-50', 'bg-neutral-100', 'bg-neutral-200',
+    'bg-slate-50', 'bg-slate-100', 'bg-slate-200',
+  ];
+
+  // Assign a unique color to each column (cycle if more columns than colors)
+  // Each column gets a color stored in its object: column.color
+  const getColumnColor = (column, idx) => {
+    return column.color || mutedColors[idx % mutedColors.length];
+  };
   const [columns, setColumns] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +55,24 @@ const MainBoard = ({ user }) => {
       if (!user) return;
       try {
         const data = await fetchBoard(user.uid);
-        setColumns(data.lanes || []);
+        // Assign different random muted colors to columns if not present
+        let lanes = data.lanes || [];
+        // Read colors from storage, only assign if missing or invalid
+        const usedColors = [];
+        lanes = lanes.map((lane, idx) => {
+          let color = lane.color;
+          if (!color || typeof color !== 'string' || color.trim() === '') {
+            const availableColors = mutedColors.filter(c => !usedColors.includes(c));
+            if (availableColors.length > 0) {
+              color = availableColors[Math.floor(Math.random() * availableColors.length)];
+            } else {
+              color = mutedColors[idx % mutedColors.length];
+            }
+          }
+          usedColors.push(color);
+          return { ...lane, color };
+        });
+        setColumns(lanes);
         setAvailableTags(data.tags || []);
       } catch (_err) {
         if (
@@ -49,10 +96,32 @@ const MainBoard = ({ user }) => {
           await saveBoard(user.uid, defaultBoard, user.uid);
           try {
             const createdData = await fetchBoard(user.uid);
-            setColumns(createdData.lanes || []);
+            // Assign colors to default lanes
+            let lanes = createdData.lanes || [];
+            const usedColors = [];
+            lanes = lanes.map((lane) => {
+              const availableColors = mutedColors.filter(c => !usedColors.includes(c));
+              const color = availableColors.length > 0
+                ? availableColors[Math.floor(Math.random() * availableColors.length)]
+                : mutedColors[Math.floor(Math.random() * mutedColors.length)];
+              usedColors.push(color);
+              return { ...lane, color };
+            });
+            setColumns(lanes);
             setAvailableTags(createdData.tags || []);
           } catch {
-            setColumns(defaultBoard.lanes);
+            // Assign colors to defaultBoard.lanes
+            let lanes = defaultBoard.lanes;
+            const usedColors = [];
+            lanes = lanes.map((lane) => {
+              const availableColors = mutedColors.filter(c => !usedColors.includes(c));
+              const color = availableColors.length > 0
+                ? availableColors[Math.floor(Math.random() * availableColors.length)]
+                : mutedColors[Math.floor(Math.random() * mutedColors.length)];
+              usedColors.push(color);
+              return { ...lane, color };
+            });
+            setColumns(lanes);
             setAvailableTags(defaultBoard.tags);
           }
         }
@@ -183,9 +252,19 @@ const MainBoard = ({ user }) => {
   };
 
   const addLane = async (columnId) => {
+    // Find used colors
+    const usedColors = columns.map(col => col.color).filter(Boolean);
+    // Find available colors
+    const availableColors = mutedColors.filter(c => !usedColors.includes(c));
+    // Pick a random available color, or fallback to any
+    const color = availableColors.length > 0
+      ? availableColors[Math.floor(Math.random() * availableColors.length)]
+      : mutedColors[Math.floor(Math.random() * mutedColors.length)];
+
     const newLane = {
       id: `new-lane-${Date.now()}`,
       title: 'New Lane',
+      color,
       rows: [ { title: 'WIP', cards: [] }, { title: 'Planned', cards: [] }, { title: 'Done', cards: [] } ],
     };
     setColumns(prevColumns => {
@@ -333,9 +412,9 @@ const MainBoard = ({ user }) => {
     <>
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start">
-          {columns.map((column) => (
+          {columns.map((column, idx) => (
             <div key={column.id} className="flex-shrink-0 w-80">
-              <div className="bg-gray-100 rounded-lg p-4">
+              <div className={`${getColumnColor(column, idx)} rounded-lg p-4`}>
                 <ColumnHeader 
                   title={column.title} 
                   updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
