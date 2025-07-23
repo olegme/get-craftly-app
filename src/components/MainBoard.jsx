@@ -58,6 +58,7 @@ const MainBoard = ({ user }) => {
         // Assign different random muted colors to columns if not present
         let lanes = data.lanes || [];
         // Read colors from storage, only assign if missing or invalid
+        let boardChanged = false;
         const usedColors = [];
         lanes = lanes.map((lane, idx) => {
           let color = lane.color;
@@ -68,12 +69,33 @@ const MainBoard = ({ user }) => {
             } else {
               color = mutedColors[idx % mutedColors.length];
             }
+            boardChanged = true;
           }
           usedColors.push(color);
-          return { ...lane, color };
+          // Assign card colors if missing
+          const newRows = (lane.rows || []).map(row => {
+            const newCards = (row.cards || []).map(card => {
+              if (!card.color || typeof card.color !== 'string' || card.color.trim() === '') {
+                // Exclude lane color for card
+                const cardAvailableColors = mutedColors.filter(c => c !== color);
+                const cardColor = cardAvailableColors.length > 0
+                  ? cardAvailableColors[Math.floor(Math.random() * cardAvailableColors.length)]
+                  : mutedColors[Math.floor(Math.random() * mutedColors.length)];
+                boardChanged = true;
+                return { ...card, color: cardColor };
+              }
+              return card;
+            });
+            return { ...row, cards: newCards };
+          });
+          return { ...lane, color, rows: newRows };
         });
         setColumns(lanes);
         setAvailableTags(data.tags || []);
+        // Save updated board if any color was assigned
+        if (boardChanged && user) {
+          await saveBoard(user.uid, { ...data, lanes }, user.uid);
+        }
       } catch (_err) {
         if (
           (_err && _err.message && _err.message.toLowerCase().includes('board not found')) ||
