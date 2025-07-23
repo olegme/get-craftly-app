@@ -79,10 +79,12 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
     }
   };
 
+  // Use card.color if present, otherwise fallback to white
+  const cardBg = card.color ? card.color : 'bg-white';
   return (
     <div
       ref={drag}
-      className={`bg-white rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+      className={`${cardBg} rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="flex items-start justify-between mb-2">
         {

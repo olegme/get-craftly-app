@@ -1,10 +1,19 @@
+## 2025-07-23
+
+### Features
+- **Styling:** Implemented a colorful design where each column on the board is assigned a unique, muted color for better visual organization.
+- **Styling:** Each new card is now assigned a random muted color, distinct from the color of the column it belongs to.
+
+### Bug Fixes
+- **Styling:** Ensured that newly assigned column and card colors are persisted to Firestore.
+
 ## 2025-07-22
 
 ### Features
 - **Deployment:** Added a new npm script to automate the deployment process and create a git tag on each successful deployment.
 
 ### Revert
-- Reverted changes related to the new color scheme and UI fixes.
+- Reverted changes related to the colorful design.
 
 ## 2025-07-14
 
