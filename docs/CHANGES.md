@@ -1,3 +1,10 @@
+## 2025-07-24
+
+### Refactoring
+- Extracted board state and logic into a `useBoard` custom hook, significantly simplifying `MainBoard.jsx`.
+- Decomposed `DraggableCard.jsx` into smaller, more focused components: `CardHeader`, `CardTitle`, and `CalendarPopup`.
+- Refactored `MainBoard.jsx` into smaller, more manageable components: `Board`, `Lane`, and `AddCardForm`. This improves code organization and maintainability.
+
 ## 2025-07-23
 
 ### Features
