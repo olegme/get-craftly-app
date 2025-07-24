@@ -1,3 +1,8 @@
+## 2025-07-24
+
+### Refactoring
+- Refactored `MainBoard.jsx` into smaller, more manageable components: `Board`, `Lane`, and `AddCardForm`. This improves code organization and maintainability.
+
 ## 2025-07-23
 
 ### Features

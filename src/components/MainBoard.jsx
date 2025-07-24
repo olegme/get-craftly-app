@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Plus } from 'lucide-react';
-import { DraggableCard } from './Card/DraggableCard';
-import { DropZone } from './Board/DropZone';
-import { ColumnHeader } from './Board/ColumnHeader';
+import { Board } from './Board/Board';
 import {
   fetchBoard,
   saveBoard,
@@ -371,133 +368,41 @@ const MainBoard = ({ user }) => {
     await addCardFirestore(user.uid, columnId, newCard, newColumns);
   };
 
-  const AddTaskButton = ({ columnId, rowIndex, addCard }) => {
-    const [showInput, setShowInput] = useState(false);
-    const [taskTitle, setTaskTitle] = useState('');
-
-    const handleAddTaskClick = () => {
-      setShowInput(true);
-    };
-
-    const handleSaveTask = () => {
-      if (taskTitle.trim()) {
-        addCard(columnId, rowIndex, taskTitle);
-        setTaskTitle('');
-        setShowInput(false);
-      }
-    };
-
-    const handleCancel = () => {
-      setTaskTitle('');
-      setShowInput(false);
-    };
-
-    return (
-      <div className="mt-3">
-        {showInput ? (
-          <>
-            <input
-              type="text"
-              className="w-full p-2 border border-gray-300 rounded-md mb-2 text-sm"
-              placeholder="New card title"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSaveTask();
-                }
-                if (e.key === 'Escape') {
-                  handleCancel();
-                }
-              }}
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={handleSaveTask}
-                className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Add
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
-          </>
-        ) : (
-          <button
-            className="w-full p-2 text-left text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center"
-            onClick={handleAddTaskClick}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add task
-          </button>
-        )}
-      </div>
-    );
+  const updateCardDate = async (cardId, columnId, rowIndex, newDate) => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const columnIndex = newColumns.findIndex(col => col.id === columnId);
+      const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
+      newColumns[columnIndex].rows[rowIndex].cards[cardIndex].date = newDate;
+      return newColumns;
+    });
+    await updateCard(user.uid, columnId, cardId, { date: newDate });
   };
 
   return (
     <>
       <div className="min-h-screen bg-gray-50 p-6">
-        <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start">
-          {columns.map((column, idx) => (
-            <div key={column.id} className="flex-shrink-0 w-80">
-              <div className={`${getColumnColor(column, idx)} rounded-lg p-4`}>
-                <ColumnHeader 
-                  title={column.title} 
-                  updateColumnTitle={(newTitle) => updateColumnTitle(column.id, newTitle)}
-                  addLane={() => addLane(column.id)}
-                  deleteLane={() => handleDeleteLane(column.id)}
-                />
-                {(column.rows || []).map((row, rowIndex) => (
-                  <div key={rowIndex} className="mb-6 bg-white rounded-lg border border-gray-200 p-3">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        {row.title}
-                      </span>
-                    </div>
-                    <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
-                      {row.cards.map((card) => (
-                        <DraggableCard 
-                          key={card.id} 
-                          card={card} 
-                          columnId={column.id} 
-                          rowIndex={rowIndex}
-                          updateCardTitle={updateCardTitle}
-                          updateCardTags={updateCardTags}
-                          availableTags={availableTags}
-                          addNewTag={addNewTag}
-                          toggleCardPriority={toggleCardPriority}
-                          toggleCardCompleted={toggleCardCompleted}
-                          updateCardDate={async (cardId, columnId, rowIndex, newDate) => {
-                            setColumns(prevColumns => {
-                              const newColumns = [...prevColumns];
-                              const columnIndex = newColumns.findIndex(col => col.id === columnId);
-                              const cardIndex = newColumns[columnIndex].rows[rowIndex].cards.findIndex(card => card.id === cardId);
-                              newColumns[columnIndex].rows[rowIndex].cards[cardIndex].date = newDate;
-                              return newColumns;
-                            });
-                            await updateCard(user.uid, columnId, cardId, { date: newDate });
-                          }}
-                        />
-                      ))}
-                      <AddTaskButton columnId={column.id} rowIndex={rowIndex} addCard={addCard} />
-                    </DropZone>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <Board
+          columns={columns}
+          getColumnColor={getColumnColor}
+          updateColumnTitle={updateColumnTitle}
+          addLane={addLane}
+          deleteLane={handleDeleteLane}
+          moveCard={moveCard}
+          updateCardTitle={updateCardTitle}
+          updateCardTags={updateCardTags}
+          availableTags={availableTags}
+          addNewTag={addNewTag}
+          toggleCardPriority={toggleCardPriority}
+          toggleCardCompleted={toggleCardCompleted}
+          updateCardDate={updateCardDate}
+          addCard={addCard}
+        />
       </div>
-      <ConfirmationDialog 
-        isOpen={dialogOpen} 
-        onConfirm={confirmDelete} 
-        onCancel={cancelDelete} 
+      <ConfirmationDialog
+        isOpen={dialogOpen}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
         message="This lane contains cards. Are you sure you want to delete it?"
       />
     </>
