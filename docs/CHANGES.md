@@ -1,5 +1,9 @@
 ## 2025-07-24
 
+### Features
+- Added a short overview of the application functionality from an end-user standpoint to `README.md`.
+- Added user management functionality description to `README.md`.
+
 ### Refactoring
 - Extracted board state and logic into a `useBoard` custom hook, significantly simplifying `MainBoard.jsx`.
 - Decomposed `DraggableCard.jsx` into smaller, more focused components: `CardHeader`, `CardTitle`, and `CalendarPopup`.
