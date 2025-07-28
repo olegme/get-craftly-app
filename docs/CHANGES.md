@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 - **Drag and Drop:** Modified the `DropZone` component to be more flexible and responsive, even when it contains other cards. This was achieved by adjusting its styling to ensure it grows with the content, providing a larger and more reliable drop target. This change improves the user experience by making the drag-and-drop functionality smoother and more intuitive.
+- **Scrolling:** Removed `justify-center` from `Board.jsx` to allow complete horizontal scrolling and prevent the left-most column from being cut off.
 
 ## 2025-07-24
 

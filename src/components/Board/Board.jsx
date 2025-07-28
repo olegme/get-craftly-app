@@ -18,7 +18,7 @@ export const Board = ({
   addCard,
 }) => {
   return (
-    <div className="flex gap-6 overflow-x-auto pb-6 w-full justify-center items-start">
+    <div className="flex gap-6 overflow-x-auto pb-6 w-full items-start">
       {columns.map((column, idx) => (
         <Lane
           key={column.id}
