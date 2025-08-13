@@ -33,7 +33,6 @@ async function createTestBoard() {
     ]
   };
   await setDoc(boardRef, boardData);
-  console.log('Test board created in Firestore.');
 }
 
-createTestBoard().catch(console.error);
+createTestBoard().catch(() => {});

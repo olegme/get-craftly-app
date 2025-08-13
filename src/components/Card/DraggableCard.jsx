@@ -6,15 +6,24 @@ import { CardTitle } from './CardTitle';
 import { CardHeader } from './CardHeader';
 import './DraggableCard.css';
 
-export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted, updateCardDate }) => {
+// Context to provide rows from Lane
+const RowsContext = React.createContext();
+
+export const DraggableCard = ({ card, columnId, rows, updateCardTitle, updateCardTags, availableTags, addNewTag, toggleCardPriority, toggleCardCompleted, updateCardDate }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
-    item: { ...card, sourceColumnId: columnId, sourceRowIndex: rowIndex },
+    item: () => {
+      // Compute the current rowIndex for this card at drag start
+      const sourceRowIndex = rows.findIndex(row => row.cards.some(c => c.id === card.id));
+      const dragItem = { ...card, sourceColumnId: columnId, sourceRowIndex };
+      return dragItem;
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-  }));
+  }), [card, columnId, rows]);
 
+  const sourceRowIndex = rows.findIndex(row => row.cards.some(c => c.id === card.id));
   const cardBg = card.color ? card.color : 'bg-white';
 
   return (
@@ -25,7 +34,7 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       <CardHeader
         card={card}
         columnId={columnId}
-        rowIndex={rowIndex}
+        rowIndex={sourceRowIndex}
         toggleCardPriority={toggleCardPriority}
         toggleCardCompleted={toggleCardCompleted}
         updateCardDate={updateCardDate}
@@ -33,14 +42,14 @@ export const DraggableCard = ({ card, columnId, rowIndex, updateCardTitle, updat
       <CardTitle
         card={card}
         columnId={columnId}
-        rowIndex={rowIndex}
+        rowIndex={sourceRowIndex}
         updateCardTitle={updateCardTitle}
       />
       <div className="flex items-center justify-between">
         <Tags
           tags={card.tags}
           availableTags={availableTags}
-          updateCardTags={(newTags) => updateCardTags(card.id, columnId, rowIndex, newTags)}
+          updateCardTags={(newTags) => updateCardTags(card.id, columnId, sourceRowIndex, newTags)}
           addNewTag={addNewTag}
         />
       </div>

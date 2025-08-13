@@ -142,33 +142,55 @@ export const useBoard = (user) => {
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
-    console.log('moveCard: Initiating card move.', { draggedCard, targetColumnId, targetRowIndex });
     const newColumns = JSON.parse(JSON.stringify(columns));
-    const { sourceColumnId, sourceRowIndex } = draggedCard;
-    const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
-    const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
-    if (!card) {
-      console.log('moveCard: Card not found, aborting move.', { draggedCard });
+
+    // Find the card's current location by id
+    let found = false;
+    let sourceColumnIdx = -1;
+    let sourceRowIdx = -1;
+    for (let cIdx = 0; cIdx < newColumns.length; cIdx++) {
+      const col = newColumns[cIdx];
+      for (let rIdx = 0; rIdx < col.rows.length; rIdx++) {
+        const row = col.rows[rIdx];
+        const cardIdx = row.cards.findIndex(c => c.id === draggedCard.id);
+        if (cardIdx !== -1) {
+          sourceColumnIdx = cIdx;
+          sourceRowIdx = rIdx;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+
+    if (!found) {
       return;
     }
 
-    console.log('moveCard: Card found, processing move logic.');
-    sourceColumn.rows[sourceRowIndex].cards = sourceColumn.rows[sourceRowIndex].cards.filter(c => c.id !== draggedCard.id);
+    const sourceColumn = newColumns[sourceColumnIdx];
+    const sourceRow = sourceColumn.rows[sourceRowIdx];
+    const card = sourceRow.cards.find(c => c.id === draggedCard.id);
+    if (!card) {
+      return;
+    }
+    // Remove from current location
+    sourceRow.cards = sourceRow.cards.filter(c => c.id !== draggedCard.id);
+
     const targetColumn = newColumns.find(c => c.id === targetColumnId);
+    if (!targetColumn) {
+      return;
+    }
+    if (!targetColumn.rows[targetRowIndex]) {
+      return;
+    }
     if (targetColumn.rows[targetRowIndex].title === 'Done') {
       card.completed = true;
-      console.log('moveCard: Card moved to "Done" row, setting completed to true.');
     } else {
       card.completed = false;
-      console.log('moveCard: Card moved to non-"Done" row, setting completed to false.');
     }
     targetColumn.rows[targetRowIndex].cards.push(card);
-
-    console.log('moveCard: Updating local state with new columns.', newColumns);
     setColumns(newColumns);
-    console.log('moveCard: Saving board to Firestore.');
     await saveBoard(user.uid, { lanes: newColumns }, user.uid);
-    console.log('moveCard: Board saved to Firestore.');
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {

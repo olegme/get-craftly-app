@@ -1,3 +1,14 @@
+# Changelog
+
+## 2025-08-13
+
+### Bug Fixes
+- **Drag and Drop:** Refactored the `moveCard` function in `useBoard.js` to reliably find and move cards, improving the drag-and-drop experience.
+
+### Refactoring & Cleanup
+- Removed console logging from `src/api/board.js`, `src/hooks/useBoard.js`, and `src/scripts/createTestBoard.js`.
+- Updated `Lane.jsx` and `DraggableCard.jsx` to pass `rows` instead of `rowIndex` for more flexible card positioning.
+
 ## 2025-07-28
 
 ### Bug Fixes
@@ -63,9 +74,6 @@
 - **Board Ownership:** Updated board ownership logic.
 - **UI/UX:** Aligned sign-in buttons and fixed linting errors.
 
-### UI Enhancements
-- Aligned the 'Sign In' buttons in a row and applied a consistent style for a cleaner look in `src/App.jsx`.
-
 ### Bug Fixes
 - Resolved multiple linting errors in `src/components/MainBoard.jsx` that were preventing the application from building successfully.
 
@@ -76,7 +84,6 @@
 - Updated MainBoardWrapper to accept and forward the user prop.
 - Ensured all board saves set the owner field for correct Firestore permissions.
 - Minor export fix in firebase.js for consistent Firebase usage.
-# Changelog
 
 ## Session at 2025-06-28
 
