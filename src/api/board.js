@@ -35,9 +35,11 @@ export async function fetchBoard(boardId) {
 
 // Create or update a board
 export async function saveBoard(boardId, boardData, ownerUid) {
+  console.log('saveBoard: Saving board to Firestore.', { boardId, boardData, ownerUid });
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
   // Always set the owner field to the user's UID
   await setDoc(boardRef, { ...boardData, owner: ownerUid }, { merge: true });
+  console.log('saveBoard: Board saved successfully.');
 }
 
 // Delete a board

@@ -138,3 +138,8 @@
 - Added persistence for date changes in `updateCardDate` within `src/components/MainBoard.jsx`.
 - Fixed `TypeError: lane.cards is not iterable` in `src/api/board.js` by ensuring `lane.cards` is always an array before iteration.
 - Fixed `TypeError: board.lanes is not iterable` in `src/api/board.js` by ensuring `board.lanes` is always an array before iteration.
+
+## 2025-08-13
+
+### Features
+- **Debugging:** Added console logging to `src/hooks/useBoard.js` and `src/api/board.js` to debug intermittent card movement issues.
