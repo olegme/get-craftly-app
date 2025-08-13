@@ -148,7 +148,7 @@ export const useBoard = (user) => {
     const sourceColumn = newColumns.find(c => c.id === sourceColumnId);
     const card = sourceColumn.rows[sourceRowIndex].cards.find(c => c.id === draggedCard.id);
     if (!card) {
-      console.log('moveCard: Card not found, aborting move.');
+      console.log('moveCard: Card not found, aborting move.', { draggedCard });
       return;
     }
 

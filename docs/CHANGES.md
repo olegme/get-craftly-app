@@ -143,3 +143,4 @@
 
 ### Features
 - **Debugging:** Added console logging to `src/hooks/useBoard.js` and `src/api/board.js` to debug intermittent card movement issues.
+- **Debugging:** Extended console log message in `src/hooks/useBoard.js` to include `draggedCard` details when a card is not found.
