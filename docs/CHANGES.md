@@ -3,6 +3,16 @@
 ## 2025-08-13
 
 ### Bug Fixes
+- **Drag and Drop:** Fixed issue with card dragging and lane updates.
+- **Drag and Drop:** Fixed moving card.
+
+### Refactoring & Cleanup
+- Removed console logging from `src/api/board.js`, `src/hooks/useBoard.js`, and `src/scripts/createTestBoard.js`.
+- Updated `Lane.jsx` and `DraggableCard.jsx` to pass `rows` instead of `rowIndex` for more flexible card positioning.
+
+## 2025-08-13
+
+### Bug Fixes
 - **Drag and Drop:** Refactored the `moveCard` function in `useBoard.js` to reliably find and move cards, improving the drag-and-drop experience.
 
 ### Refactoring & Cleanup
