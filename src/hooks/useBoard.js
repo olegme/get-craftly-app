@@ -49,6 +49,7 @@ export const useBoard = (user) => {
         let lanes = data.lanes || [];
         let boardChanged = false;
         const usedColors = [];
+        
         lanes = lanes.map((lane, idx) => {
           let color = lane.color;
           if (!color || typeof color !== 'string' || color.trim() === '') {
@@ -77,6 +78,38 @@ export const useBoard = (user) => {
           });
           return { ...lane, color, rows: newRows };
         });
+        
+        // Move completed cards to the "Done" row if they're not already there
+        lanes = lanes.map(lane => {
+          const doneRowIndex = lane.rows.findIndex(row => row.title === 'Done');
+          const wipRowIndex = lane.rows.findIndex(row => row.title === 'WIP');
+          const plannedRowIndex = lane.rows.findIndex(row => row.title === 'Planned');
+          
+          if (doneRowIndex !== -1) {
+            // Collect all completed cards from all rows
+            const completedCards = [];
+            const updatedRows = lane.rows.map((row, rowIndex) => {
+              const rowCompletedCards = row.cards.filter(card => card.completed);
+              const rowNonCompletedCards = row.cards.filter(card => !card.completed);
+              
+              if (rowCompletedCards.length > 0) {
+                completedCards.push(...rowCompletedCards);
+                boardChanged = true;
+                return { ...row, cards: rowNonCompletedCards };
+              }
+              return row;
+            });
+            
+            // Add all completed cards to the "Done" row
+            if (completedCards.length > 0) {
+              updatedRows[doneRowIndex] = { ...updatedRows[doneRowIndex], cards: [...updatedRows[doneRowIndex].cards, ...completedCards] };
+            }
+            
+            return { ...lane, rows: updatedRows };
+          }
+          return lane;
+        });
+        
         setColumns(lanes);
         setAvailableTags(data.tags || []);
         if (boardChanged && user) {
@@ -112,6 +145,28 @@ export const useBoard = (user) => {
                 ? availableColors[Math.floor(Math.random() * availableColors.length)]
                 : mutedColors[Math.floor(Math.random() * mutedColors.length)];
               usedColors.push(color);
+              
+              // Move completed cards to the "Done" row if they're not already there
+              const doneRowIndex = lane.rows.findIndex(row => row.title === 'Done');
+              if (doneRowIndex !== -1) {
+                const completedCards = [];
+                const updatedRows = lane.rows.map((row, rowIndex) => {
+                  const rowCompletedCards = row.cards.filter(card => card.completed);
+                  const rowNonCompletedCards = row.cards.filter(card => !card.completed);
+                  
+                  if (rowCompletedCards.length > 0) {
+                    completedCards.push(...rowCompletedCards);
+                    return { ...row, cards: rowNonCompletedCards };
+                  }
+                  return row;
+                });
+                
+                if (completedCards.length > 0) {
+                  updatedRows[doneRowIndex] = { ...updatedRows[doneRowIndex], cards: [...updatedRows[doneRowIndex].cards, ...completedCards] };
+                }
+                
+                return { ...lane, color, rows: updatedRows };
+              }
               return { ...lane, color };
             });
             setColumns(lanes);
