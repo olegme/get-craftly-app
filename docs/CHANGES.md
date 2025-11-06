@@ -1,5 +1,8 @@
 ## 2025-11-06
 
+- Implemented code splitting in vite.config.js to resolve chunk size warnings: Split vendor dependencies into separate chunks including react-vendor, firebase-vendor, react-dnd, lucide-react, date-fns, and react-datepicker, reducing main bundle size from 907.57 kB to 198.05 kB
+## 2025-11-06
+
 - Improved card completion logic in useBoard hook: Cards now properly move to/from the 'Done' row based on completion status, with better handling of card movement between rows when toggling completion status
 # Changelog
 
