@@ -1,3 +1,6 @@
+## 2025-11-06
+
+- Improved card completion logic in useBoard hook: Cards now properly move to/from the 'Done' row based on completion status, with better handling of card movement between rows when toggling completion status
 # Changelog
 
 ## 2025-08-13

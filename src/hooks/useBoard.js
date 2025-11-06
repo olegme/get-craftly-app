@@ -82,20 +82,21 @@ export const useBoard = (user) => {
         // Move completed cards to the "Done" row if they're not already there
         lanes = lanes.map(lane => {
           const doneRowIndex = lane.rows.findIndex(row => row.title === 'Done');
-          const wipRowIndex = lane.rows.findIndex(row => row.title === 'WIP');
-          const plannedRowIndex = lane.rows.findIndex(row => row.title === 'Planned');
           
           if (doneRowIndex !== -1) {
-            // Collect all completed cards from all rows
+            // Collect all completed cards from all rows except the Done row
             const completedCards = [];
             const updatedRows = lane.rows.map((row, rowIndex) => {
-              const rowCompletedCards = row.cards.filter(card => card.completed);
-              const rowNonCompletedCards = row.cards.filter(card => !card.completed);
-              
-              if (rowCompletedCards.length > 0) {
-                completedCards.push(...rowCompletedCards);
-                boardChanged = true;
-                return { ...row, cards: rowNonCompletedCards };
+              // Only collect completed cards from non-Done rows
+              if (rowIndex !== doneRowIndex) {
+                const rowCompletedCards = row.cards.filter(card => card.completed);
+                const rowNonCompletedCards = row.cards.filter(card => !card.completed);
+                
+                if (rowCompletedCards.length > 0) {
+                  completedCards.push(...rowCompletedCards);
+                  boardChanged = true;
+                  return { ...row, cards: rowNonCompletedCards };
+                }
               }
               return row;
             });
@@ -151,12 +152,15 @@ export const useBoard = (user) => {
               if (doneRowIndex !== -1) {
                 const completedCards = [];
                 const updatedRows = lane.rows.map((row, rowIndex) => {
-                  const rowCompletedCards = row.cards.filter(card => card.completed);
-                  const rowNonCompletedCards = row.cards.filter(card => !card.completed);
-                  
-                  if (rowCompletedCards.length > 0) {
-                    completedCards.push(...rowCompletedCards);
-                    return { ...row, cards: rowNonCompletedCards };
+                  // Only collect completed cards from non-Done rows
+                  if (rowIndex !== doneRowIndex) {
+                    const rowCompletedCards = row.cards.filter(card => card.completed);
+                    const rowNonCompletedCards = row.cards.filter(card => !card.completed);
+                    
+                    if (rowCompletedCards.length > 0) {
+                      completedCards.push(...rowCompletedCards);
+                      return { ...row, cards: rowNonCompletedCards };
+                    }
                   }
                   return row;
                 });
@@ -240,9 +244,11 @@ export const useBoard = (user) => {
     }
     if (targetColumn.rows[targetRowIndex].title === 'Done') {
       card.completed = true;
-    } else {
+    } else if (targetColumn.rows[targetRowIndex].title !== 'Done' && sourceRow.title === 'Done') {
+      // Only set to false if moving FROM Done to another row
       card.completed = false;
     }
+    // Otherwise, keep the card's current completion status
     targetColumn.rows[targetRowIndex].cards.push(card);
     setColumns(newColumns);
     await saveBoard(user.uid, { lanes: newColumns }, user.uid);
@@ -308,18 +314,46 @@ export const useBoard = (user) => {
       const newColumns = JSON.parse(JSON.stringify(prevColumns));
       const columnIndex = newColumns.findIndex(col => col.id === columnId);
       const currentColumn = newColumns[columnIndex];
-      const cardToMove = currentColumn.rows[rowIndex].cards.find(card => card.id === cardId);
-      if (!cardToMove) return prevColumns;
-      cardToMove.completed = !cardToMove.completed;
-      currentColumn.rows[rowIndex].cards = currentColumn.rows[rowIndex].cards.filter(card => card.id !== cardId);
+      const currentRow = currentColumn.rows[rowIndex];
+      const cardIndex = currentRow.cards.findIndex(card => card.id === cardId);
+      if (cardIndex === -1) return prevColumns;
+      
+      const cardToMove = { ...currentRow.cards[cardIndex] };
+      const isCurrentlyCompleted = cardToMove.completed;
+      cardToMove.completed = !isCurrentlyCompleted;
+      
+      // Remove card from current row
+      currentRow.cards = currentRow.cards.filter(card => card.id !== cardId);
+      
+      // Find Done row
       const doneRowIndex = currentColumn.rows.findIndex(row => row.title === 'Done');
-      const wipRowIndex = currentColumn.rows.findIndex(row => row.title === 'WIP');
-      if (doneRowIndex === -1 || wipRowIndex === -1) return prevColumns;
-      if (cardToMove.completed) {
-        currentColumn.rows[doneRowIndex].cards.push(cardToMove);
+      const sourceRowIndex = currentColumn.rows.findIndex(row => row.title === currentRow.title);
+      
+      if (doneRowIndex !== -1) {
+        if (cardToMove.completed) {
+          // If marking as completed, move to Done row
+          currentColumn.rows[doneRowIndex].cards.push(cardToMove);
+        } else {
+          // If unmarking as completed, keep in the same row (or move to WIP if it was in Done)
+          if (sourceRowIndex === doneRowIndex) {
+            // If the card was in Done and is now uncompleted, move to WIP or current non-Done row
+            const wipRowIndex = currentColumn.rows.findIndex(row => row.title === 'WIP');
+            if (wipRowIndex !== -1) {
+              currentColumn.rows[wipRowIndex].cards.push(cardToMove);
+            } else {
+              // If no WIP row exists, add to current row
+              currentRow.cards.push(cardToMove);
+            }
+          } else {
+            // If unmarking but was not in Done row, add back to the original row
+            currentRow.cards.push(cardToMove);
+          }
+        }
       } else {
-        currentColumn.rows[wipRowIndex].cards.push(cardToMove);
+        // If no Done row exists, just update the completion status in place
+        currentRow.cards.push(cardToMove);
       }
+      
       return newColumns;
     });
     const card = columns.find(col => col.id === columnId).rows[rowIndex].cards.find(c => c.id === cardId);
