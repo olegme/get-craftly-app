@@ -1,3 +1,12 @@
+## 2025-11-24
+### Features
+- **Lane Dragging:** Implemented horizontal lane dragging functionality, allowing users to reorder lanes by dragging them left or right on the board. The new functionality includes:
+  - Added LANE item type to ItemTypes.js
+  - Created LaneDragWrapper.jsx component with drag and drop functionality
+ - Updated Board.jsx to wrap lanes with drag wrapper
+  - Added moveLane function to useBoard hook with persistence to Firebase
+ - Updated MainBoard.jsx to pass moveLane function to Board component
+  - Visual feedback during dragging including opacity changes and drop indicators
 ## 2025-11-06
 
 - Implemented code splitting in vite.config.js to resolve chunk size warnings: Split vendor dependencies into separate chunks including react-vendor, firebase-vendor, react-dnd, lucide-react, date-fns, and react-datepicker, reducing main bundle size from 907.57 kB to 198.05 kB
