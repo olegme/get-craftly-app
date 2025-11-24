@@ -1,5 +1,12 @@
 ## 2025-11-24
 ### Features
+- **Version Tracking:** Added version information display in the UI showing application version, git commit hash, and build timestamp. The system automatically generates fresh version information during each build process.
+  - Created VersionInfo.jsx component for displaying version information
+  - Added version script (scripts/version.js) to generate version information
+  - Updated package.json to run version script as prebuild step
+  - Version info is displayed in bottom-right corner of UI
+## 2025-11-24
+### Features
 - **Lane Dragging:** Implemented horizontal lane dragging functionality, allowing users to reorder lanes by dragging them left or right on the board. The new functionality includes:
   - Added LANE item type to ItemTypes.js
   - Created LaneDragWrapper.jsx component with drag and drop functionality
