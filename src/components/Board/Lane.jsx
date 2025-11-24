@@ -38,21 +38,34 @@ export const Lane = ({
               </span>
             </div>
             <DropZone columnId={column.id} rowIndex={rowIndex} moveCard={moveCard}>
-              {row.cards.map((card) => (
-                <DraggableCard
-                  key={card.id}
-                  card={card}
-                  columnId={column.id}
-                  rows={column.rows}
-                  updateCardTitle={updateCardTitle}
-                  updateCardTags={updateCardTags}
-                  availableTags={availableTags}
-                  addNewTag={addNewTag}
-                  toggleCardPriority={toggleCardPriority}
-                  toggleCardCompleted={toggleCardCompleted}
-                  updateCardDate={updateCardDate}
-                />
-              ))}
+              {(() => {
+                // Sort cards only for WIP and PLANNED rows, not DONE
+                let sortedCards = [...row.cards];
+                if (row.title.toLowerCase() === 'wip' || row.title.toLowerCase() === 'planned') {
+                  sortedCards.sort((a, b) => {
+                    // Priority cards (true) should come first, then non-priority (false)
+                    if (a.priority && !b.priority) return -1;
+                    if (!a.priority && b.priority) return 1;
+                    return 0; // Maintain original order for cards with same priority status
+                  });
+                }
+                
+                return sortedCards.map((card) => (
+                  <DraggableCard
+                    key={card.id}
+                    card={card}
+                    columnId={column.id}
+                    rows={column.rows}
+                    updateCardTitle={updateCardTitle}
+                    updateCardTags={updateCardTags}
+                    availableTags={availableTags}
+                    addNewTag={addNewTag}
+                    toggleCardPriority={toggleCardPriority}
+                    toggleCardCompleted={toggleCardCompleted}
+                    updateCardDate={updateCardDate}
+                  />
+                ));
+              })()}
               <AddCardForm columnId={column.id} rowIndex={rowIndex} addCard={addCard} />
             </DropZone>
           </div>
