@@ -392,6 +392,17 @@ export const useBoard = (user) => {
     });
   };
 
+  // Function to move lanes horizontally
+  const moveLane = (fromIndex, toIndex) => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const [movedLane] = newColumns.splice(fromIndex, 1);
+      newColumns.splice(toIndex, 0, movedLane);
+      saveBoard(user.uid, { lanes: newColumns }, user.uid);
+      return newColumns;
+    });
+  };
+
   const handleDeleteLane = (columnId) => {
     const columnToDelete = columns.find(col => col.id === columnId);
     const hasCards = columnToDelete.rows.some(row => row.cards.length > 0);
@@ -474,23 +485,24 @@ export const useBoard = (user) => {
   };
 
   return {
-    columns,
-    availableTags,
-    dialogOpen,
-    laneToDelete,
-    getColumnColor,
-    addNewTag,
-    moveCard,
-    updateCardTitle,
-    updateCardTags,
-    toggleCardPriority,
-    toggleCardCompleted,
-    updateColumnTitle,
-    addLane,
-    handleDeleteLane,
-    confirmDelete,
-    cancelDelete,
-    addCard,
-    updateCardDate,
-  };
+      columns,
+      availableTags,
+      dialogOpen,
+      laneToDelete,
+      getColumnColor,
+      addNewTag,
+      moveCard,
+      moveLane,
+      updateCardTitle,
+      updateCardTags,
+      toggleCardPriority,
+      toggleCardCompleted,
+      updateColumnTitle,
+      addLane,
+      handleDeleteLane,
+      confirmDelete,
+      cancelDelete,
+      addCard,
+      updateCardDate,
+    };
 };
