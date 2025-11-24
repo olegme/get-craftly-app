@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import MainBoard from './components/MainBoard';
+import VersionInfo from './components/VersionInfo';
 import { signIn, signOutUser, onUserStateChanged } from './auth';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -101,6 +102,7 @@ function App() {
         )}
       </header>
       {user && <MainBoard user={user} />}
+      <VersionInfo />
     </div>
   );
 }
