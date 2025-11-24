@@ -1,5 +1,11 @@
 ## 2025-11-24
 ### Features
+- **Priority Card Sorting:** Implemented automatic sorting to display priority-flagged cards above non-priority cards in WIP and PLANNED sections. Priority cards are now always shown at the top of these sections, while the DONE section maintains its original card order without sorting.
+  - Updated Lane.jsx component to sort cards by priority for WIP and PLANNED rows only
+  - Non-priority cards maintain their relative order below priority cards
+  - DONE section remains unsorted as requested
+## 2025-11-24
+### Features
 - **Version Tracking:** Added version information display in the UI showing application version, git commit hash, and build timestamp. The system automatically generates fresh version information during each build process.
   - Created VersionInfo.jsx component for displaying version information
   - Added version script (scripts/version.js) to generate version information
