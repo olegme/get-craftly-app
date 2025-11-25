@@ -1,3 +1,8 @@
+## 2025-11-25
+### Bug Fixes
+- **Board Scrolling:** Reworked board layout to keep horizontal scroll accessible with fixed floating controls, removed double vertical scrollbars, and repositioned version badge to avoid overlap with controls.
+### Misc
+- **Release:** Bumped version to 0.2.2.
 ## 2025-11-24
 ### Features
 - **Priority Card Sorting:** Implemented automatic sorting to display priority-flagged cards above non-priority cards in WIP and PLANNED sections. Priority cards are now always shown at the top of these sections, while the DONE section maintains its original card order without sorting.
@@ -194,4 +199,3 @@
 
 ### Features
 - **Board Initialization:** Ensured that when the application starts, all items marked as completed are moved to the DONE section of their respective lanes. This provides consistent behavior by organizing completed cards to the correct rows during initial board loading.
-
