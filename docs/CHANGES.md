@@ -1,3 +1,10 @@
+## 2026-02-01
+### Bug Fixes
+- **Drag and Drop:** Fixed card move persistence to use the latest board state and prevent completed cards from being reset.
+### Tests & Tooling
+- Added Playwright E2E regression test for drag-and-drop and Node test coverage for move logic.
+- Added `.env.example`, E2E testing docs, and updated lint config/ignores for generated artifacts.
+
 ## 2025-11-25
 ### Bug Fixes
 - **Board Scrolling:** Reworked board layout to keep horizontal scroll accessible with fixed floating controls, removed double vertical scrollbars, and repositioned version badge to avoid overlap with controls.

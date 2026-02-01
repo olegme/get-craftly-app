@@ -9,6 +9,9 @@
     "prebuild": "node scripts/version.js",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "preview": "vite preview",
     "deploy": "firebase deploy --only hosting"
   },
@@ -23,10 +26,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.58.1",
     "@tailwindcss/vite": "^4.1.10",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
+    "dotenv": "^17.0.0",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",

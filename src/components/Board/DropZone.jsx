@@ -14,6 +14,9 @@ export const DropZone = ({ children, columnId, rowIndex, moveCard }) => {
   return (
     <div
       ref={drop}
+      data-testid="dropzone"
+      data-lane-id={columnId}
+      data-row-index={rowIndex}
       className={`flex-grow min-h-20 rounded-lg p-2 transition-colors ${
         isOver ? 'bg-blue-50 border-2 border-blue-200 border-dashed' : 'bg-gray-50'
       }`}

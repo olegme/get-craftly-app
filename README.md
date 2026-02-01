@@ -59,3 +59,7 @@ This started as a side project to my other side projects. There is no manual cod
 ## Project Setup
 
 For a step-by-step setup guide, see `docs/initial-setup.md`.
+
+## Testing
+
+- E2E: `docs/e2e-testing.md`

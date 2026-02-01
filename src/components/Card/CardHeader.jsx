@@ -26,11 +26,13 @@ export const CardHeader = ({ card, columnId, rowIndex, toggleCardPriority, toggl
         card.completed ? (
           <CheckSquare
             className="w-4 h-4 mr-1 text-green-500 cursor-pointer"
+            data-testid="card-complete-toggle"
             onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
           />
         ) : (
           <Square
             className="w-4 h-4 mr-1 text-gray-400 cursor-pointer"
+            data-testid="card-complete-toggle"
             onClick={() => toggleCardCompleted(card.id, columnId, rowIndex)}
           />
         )

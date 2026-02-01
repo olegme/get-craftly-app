@@ -6,6 +6,7 @@ import {
   updateCard,
   addCard as addCardFirestore
 } from '../api/board';
+import { applyMoveCard } from './boardUtils';
 
 export const useBoard = (user) => {
   const mutedColors = [
@@ -201,57 +202,21 @@ export const useBoard = (user) => {
   };
 
   const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
-    const newColumns = JSON.parse(JSON.stringify(columns));
+    let updatedColumns = null;
+    let didMove = false;
 
-    // Find the card's current location by id
-    let found = false;
-    let sourceColumnIdx = -1;
-    let sourceRowIdx = -1;
-    for (let cIdx = 0; cIdx < newColumns.length; cIdx++) {
-      const col = newColumns[cIdx];
-      for (let rIdx = 0; rIdx < col.rows.length; rIdx++) {
-        const row = col.rows[rIdx];
-        const cardIdx = row.cards.findIndex(c => c.id === draggedCard.id);
-        if (cardIdx !== -1) {
-          sourceColumnIdx = cIdx;
-          sourceRowIdx = rIdx;
-          found = true;
-          break;
-        }
-      }
-      if (found) break;
-    }
+    setColumns(prevColumns => {
+      const result = applyMoveCard(prevColumns, draggedCard, targetColumnId, targetRowIndex);
+      updatedColumns = result.columns;
+      didMove = result.didMove;
+      return result.columns;
+    });
 
-    if (!found) {
+    if (!didMove) {
       return;
     }
 
-    const sourceColumn = newColumns[sourceColumnIdx];
-    const sourceRow = sourceColumn.rows[sourceRowIdx];
-    const card = sourceRow.cards.find(c => c.id === draggedCard.id);
-    if (!card) {
-      return;
-    }
-    // Remove from current location
-    sourceRow.cards = sourceRow.cards.filter(c => c.id !== draggedCard.id);
-
-    const targetColumn = newColumns.find(c => c.id === targetColumnId);
-    if (!targetColumn) {
-      return;
-    }
-    if (!targetColumn.rows[targetRowIndex]) {
-      return;
-    }
-    if (targetColumn.rows[targetRowIndex].title === 'Done') {
-      card.completed = true;
-    } else if (targetColumn.rows[targetRowIndex].title !== 'Done' && sourceRow.title === 'Done') {
-      // Only set to false if moving FROM Done to another row
-      card.completed = false;
-    }
-    // Otherwise, keep the card's current completion status
-    targetColumn.rows[targetRowIndex].cards.push(card);
-    setColumns(newColumns);
-    await saveBoard(user.uid, { lanes: newColumns }, user.uid);
+    await saveBoard(user.uid, { lanes: updatedColumns }, user.uid);
   };
 
   const updateCardTitle = async (cardId, columnId, rowIndex, newTitle) => {
