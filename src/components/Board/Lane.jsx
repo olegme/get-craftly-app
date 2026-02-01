@@ -22,7 +22,7 @@ export const Lane = ({
   addCard,
 }) => {
   return (
-    <div key={column.id} className="flex-shrink-0 w-80">
+    <div key={column.id} className="flex-shrink-0 w-80" data-testid="lane" data-lane-id={column.id} data-lane-title={column.title}>
       <div className={`${getColumnColor(column, columnIndex)} rounded-lg p-4`}>
         <ColumnHeader
           title={column.title}
@@ -32,7 +32,7 @@ export const Lane = ({
         />
         <div className="mt-2 space-y-6 pr-2">
           {(column.rows || []).map((row, rowIndex) => (
-            <div key={rowIndex} className="bg-white rounded-lg border border-gray-200 p-3">
+            <div key={rowIndex} className="bg-white rounded-lg border border-gray-200 p-3" data-testid="lane-row" data-row-title={row.title}>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   {row.title}

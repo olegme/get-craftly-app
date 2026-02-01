@@ -6,7 +6,7 @@ import { execSync } from 'child_process';
 let gitCommit = 'unknown';
 try {
   gitCommit = execSync('git rev-parse --short HEAD').toString().trim();
-} catch (e) {
+} catch {
   console.log('Could not get git commit hash, using "unknown"');
 }
 

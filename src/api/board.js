@@ -14,20 +14,13 @@ const BOARD_COLLECTION = 'boards';
 
 // Fetch a board by ID
 export async function fetchBoard(boardId) {
-  
   const boardRef = doc(collection(db, BOARD_COLLECTION), boardId);
-  let snap;
-  try {
-    snap = await getDoc(boardRef);
-    
-  } catch (err) {
-    throw err;
-  }
+  const snap = await getDoc(boardRef);
   if (!snap.exists()) {
     throw new Error('Board not found');
   }
   const data = snap.data();
- 
+
   return data;
 }
 

@@ -20,11 +20,10 @@ export const LaneDragWrapper = ({
   });
 
   // Drop target for lane
-  const [{ isOver, canDrop }, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.LANE,
     collect: (monitor) => ({
       isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
     }),
     hover: (draggedItem, monitor) => {
       if (!ref.current) {

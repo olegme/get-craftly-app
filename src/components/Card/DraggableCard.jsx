@@ -29,6 +29,9 @@ export const DraggableCard = ({ card, columnId, rows, updateCardTitle, updateCar
   return (
     <div
       ref={drag}
+      data-card-id={card.id}
+      data-card-title={card.title}
+      data-card-completed={card.completed ? 'true' : 'false'}
       className={`${cardBg} rounded-lg border border-gray-200 p-3 mb-3 cursor-move hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : 'opacity-100'}`}
     >
       <CardHeader
