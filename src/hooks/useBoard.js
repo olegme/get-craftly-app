@@ -45,11 +45,42 @@ export const useBoard = (user) => {
   useEffect(() => {
     async function loadBoard() {
       if (!user) return;
+      const reorderLanes = (lanesToOrder) => {
+        const withMeta = lanesToOrder.map((lane, index) => {
+          const wipRow = (lane.rows || []).find(row => row.title.toLowerCase() === 'wip');
+          const plannedRow = (lane.rows || []).find(row => row.title.toLowerCase() === 'planned');
+          const hasWip = wipRow && (wipRow.cards || []).length > 0;
+          const hasPlanned = plannedRow && (plannedRow.cards || []).length > 0;
+          const group = hasWip ? 0 : (hasPlanned ? 1 : 2);
+          return { lane, index, group };
+        });
+        const ordered = withMeta
+          .slice()
+          .sort((a, b) => (a.group - b.group) || (a.index - b.index))
+          .map(item => item.lane);
+        const didReorder = ordered.some((lane, idx) => lane !== lanesToOrder[idx]);
+        return { lanes: ordered, didReorder };
+      };
       try {
         const data = await fetchBoard(user.uid);
         let lanes = data.lanes || [];
         let boardChanged = false;
         const usedColors = [];
+
+        if (lanes.length === 0) {
+          lanes = [
+            {
+              id: `lane-${Date.now()}`,
+              title: 'To Do',
+              rows: [
+                { title: 'WIP', cards: [] },
+                { title: 'Planned', cards: [] },
+                { title: 'Done', cards: [] }
+              ]
+            }
+          ];
+          boardChanged = true;
+        }
         
         lanes = lanes.map((lane, idx) => {
           let color = lane.color;
@@ -111,6 +142,12 @@ export const useBoard = (user) => {
           }
           return lane;
         });
+
+        const laneOrderResult = reorderLanes(lanes);
+        if (laneOrderResult.didReorder) {
+          lanes = laneOrderResult.lanes;
+          boardChanged = true;
+        }
         
         setColumns(lanes);
         setAvailableTags(data.tags || []);
@@ -174,6 +211,10 @@ export const useBoard = (user) => {
               }
               return { ...lane, color };
             });
+            const laneOrderResult = reorderLanes(lanes);
+            if (laneOrderResult.didReorder) {
+              lanes = laneOrderResult.lanes;
+            }
             setColumns(lanes);
             setAvailableTags(createdData.tags || []);
           } catch {
@@ -187,6 +228,10 @@ export const useBoard = (user) => {
               usedColors.push(color);
               return { ...lane, color };
             });
+            const laneOrderResult = reorderLanes(lanes);
+            if (laneOrderResult.didReorder) {
+              lanes = laneOrderResult.lanes;
+            }
             setColumns(lanes);
             setAvailableTags(defaultBoard.tags);
           }

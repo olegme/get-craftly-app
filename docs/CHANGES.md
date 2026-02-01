@@ -6,6 +6,10 @@
 - Added `.env.example`, E2E testing docs, and updated lint config/ignores for generated artifacts.
 ### Release
 - Added versioning automation (`postversion`) with changelog helper and documented version bump usage.
+### Features
+- **Lane Ordering:** Lanes automatically reorder on load based on WIP, then Planned, then empty lanes.
+### Tests
+- Added E2E coverage for lane auto ordering with cleanup logic.
 
 ## 2025-11-25
 ### Bug Fixes
