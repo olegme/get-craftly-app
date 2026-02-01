@@ -10,6 +10,7 @@ This project includes an end-to-end test that reproduces the drag-and-drop regre
 - Adds a card in the WIP row of the first lane and marks it done.
 - Moves a different card in the second lane from Planned to WIP.
 - Asserts the done card stays in the Done row and remains completed.
+- Validates automatic lane ordering by WIP, then Planned, then empty lanes, and cleans up E2E lanes.
 
 ## Prerequisites
 

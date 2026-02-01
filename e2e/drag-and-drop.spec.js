@@ -6,15 +6,67 @@ const password = process.env.E2E_PASSWORD;
 const mp3LaneTitle = 'MP3 Tag Inspector E2E';
 const otherLaneTitle = 'Other Lane E2E';
 
+const cleanupMarker = 'E2E';
+
 async function ensureTwoLanes(page) {
   const lanes = page.locator('[data-testid="lane"]');
-  const count = await lanes.count();
-  if (count >= 2) return;
+  while (await lanes.count() < 2) {
+    const firstLane = lanes.first();
+    await firstLane.getByTestId('lane-menu-toggle').scrollIntoViewIfNeeded();
+    await firstLane.getByTestId('lane-menu-toggle').click();
+    await firstLane.getByText('Add Lane', { exact: true }).click();
+  }
+}
 
-  const firstLane = lanes.first();
-  await firstLane.getByTestId('lane-menu-toggle').click();
-  await firstLane.getByText('Add Lane', { exact: true }).click();
-  await expect(lanes).toHaveCount(2);
+async function waitForLanes(page) {
+  const lanes = page.locator('[data-testid="lane"]');
+  const start = Date.now();
+  while (Date.now() - start < 30000) {
+    if (await lanes.count() > 0) return;
+    await page.waitForTimeout(500);
+  }
+  throw new Error('Timed out waiting for lanes to load');
+}
+
+async function deleteLaneIfPresent(lane) {
+  await lane.getByTestId('lane-menu-toggle').scrollIntoViewIfNeeded();
+  await lane.getByTestId('lane-menu-toggle').click();
+  await lane.getByText('Delete Lane', { exact: true }).click();
+  const confirm = lane.page().getByText('This lane contains cards. Are you sure you want to delete it?');
+  if (await confirm.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await lane.page().getByRole('button', { name: 'Delete' }).click();
+  }
+}
+
+async function cleanupLanes(page) {
+  const lanes = page.locator('[data-testid="lane"]');
+  if (await lanes.count() === 0) {
+    return;
+  }
+  let removedAny = true;
+  while (removedAny) {
+    removedAny = false;
+    const titles = await lanes.evaluateAll(nodes =>
+      nodes.map(node => {
+        const attr = node.getAttribute('data-lane-title');
+        if (attr) return attr;
+        const heading = node.querySelector('h2');
+        return heading ? heading.textContent?.trim() : null;
+      })
+    );
+    for (let i = 0; i < titles.length; i++) {
+      const title = titles[i];
+      if (title && title.includes(cleanupMarker)) {
+        await deleteLaneIfPresent(lanes.nth(i));
+        removedAny = true;
+        break;
+      }
+    }
+  }
+  if (await lanes.count() === 0) {
+    await page.reload();
+    await waitForLanes(page);
+  }
 }
 
 async function renameLane(lane, title) {
@@ -52,6 +104,8 @@ test.describe('drag-and-drop regression', () => {
     }
     await expect(signedIn).toBeVisible();
 
+    await waitForLanes(page);
+    await cleanupLanes(page);
     await ensureTwoLanes(page);
 
     const lanes = page.locator('[data-testid="lane"]');
@@ -88,5 +142,7 @@ test.describe('drag-and-drop regression', () => {
     await expect(mp3DoneRow.locator(`[data-card-title="${doneCardTitle}"]`)).toHaveCount(1);
     await expect(mp3DoneRow.locator(`[data-card-title="${doneCardTitle}"]`)).toHaveAttribute('data-card-completed', 'true');
     await expect(mp3Lane.locator(`[data-testid="lane-row"][data-row-title="WIP"] [data-card-title="${doneCardTitle}"]`)).toHaveCount(0);
+
+    await cleanupLanes(page);
   });
 });
