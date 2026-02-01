@@ -1,4 +1,8 @@
 ## 2026-02-01
+### Release
+- Version: 1.1.0
+
+## 2026-02-01
 ### Bug Fixes
 - **Drag and Drop:** Fixed card move persistence to use the latest board state and prevent completed cards from being reset.
 ### Tests & Tooling
