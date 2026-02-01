@@ -7,6 +7,7 @@
     "dev": "vite",
     "predev": "node scripts/version.js",
     "version": "node scripts/version.js",
+    "postversion": "node scripts/version.js && node scripts/changelog.js",
     "prebuild": "node scripts/version.js",
     "build": "vite build",
     "lint": "eslint .",

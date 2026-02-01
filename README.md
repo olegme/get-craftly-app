@@ -63,3 +63,13 @@ For a step-by-step setup guide, see `docs/initial-setup.md`.
 ## Testing
 
 - E2E: `docs/e2e-testing.md`
+
+## Versioning
+
+Use npm versioning to bump the app version and update build metadata:
+
+```bash
+npm version patch   # or minor/major
+```
+
+This updates `package.json`, regenerates `.env.local`, and prepends a release entry in `docs/CHANGES.md`.

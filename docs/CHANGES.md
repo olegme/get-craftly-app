@@ -4,6 +4,8 @@
 ### Tests & Tooling
 - Added Playwright E2E regression test for drag-and-drop and Node test coverage for move logic.
 - Added `.env.example`, E2E testing docs, and updated lint config/ignores for generated artifacts.
+### Release
+- Added versioning automation (`postversion`) with changelog helper and documented version bump usage.
 
 ## 2025-11-25
 ### Bug Fixes
