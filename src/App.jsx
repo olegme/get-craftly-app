@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import MainBoard from './components/MainBoard';
 import VersionInfo from './components/VersionInfo';
+import AdminDashboard from './components/AdminDashboard';
 import { signIn, signOutUser, onUserStateChanged } from './auth';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, getIdTokenResult, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from './firebase.js';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -50,6 +53,46 @@ function App() {
     const unsubscribe = onUserStateChanged(setUser);
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const upsertUser = async () => {
+      if (!user) return;
+      const userRef = doc(collection(db, 'users'), user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName || '',
+        lastActive: serverTimestamp(),
+      }, { merge: true });
+    };
+    upsertUser();
+  }, [user]);
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadClaims = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const tokenResult = await getIdTokenResult(user, true);
+        if (!cancelled) {
+          setIsAdmin(Boolean(tokenResult?.claims?.admin));
+        }
+      } catch {
+        if (!cancelled) {
+          setIsAdmin(false);
+        }
+      }
+    };
+    loadClaims();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   return (
     <div className="App">
@@ -101,6 +144,7 @@ function App() {
           </div>
         )}
       </header>
+      {user && isAdmin && <AdminDashboard user={user} />}
       {user && <MainBoard user={user} />}
       <VersionInfo />
     </div>
