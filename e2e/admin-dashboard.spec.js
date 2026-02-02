@@ -27,6 +27,7 @@ test.describe('admin dashboard', () => {
   test.skip(!email || !password, 'E2E_EMAIL and E2E_PASSWORD are required to run this test.');
 
   test('renders dashboard without console errors', async ({ page }) => {
+    // Requires the test user to have the Firebase Auth custom claim: admin=true.
     const consoleErrors = [];
     const pageErrors = [];
     page.on('console', msg => {

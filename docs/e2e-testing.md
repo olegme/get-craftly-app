@@ -18,6 +18,7 @@ This project includes an end-to-end test that reproduces the drag-and-drop regre
 - Local dev server (Playwright can start it for you).
 - Set required env vars in `.env` (see `.env.example` for placeholders).
 - If the password contains `#`, wrap it in quotes or escape it so dotenv parses it correctly.
+- Admin dashboard tests require an `admin` custom claim on the test user (see below).
 
 ## Install and run
 
@@ -42,3 +43,23 @@ E2E_PASSWORD="XjnAXR8@e4X#PR"
 
 - The test creates cards and renames the first two lanes for stability.
 - Use a dedicated test account to avoid polluting real data.
+- Admin dashboard checks are gated by an `admin` custom claim on the user.
+- Keep service account JSON outside the repo (e.g., `~/.config/firebase/`) and never commit it.
+
+## Admin Claim Flow
+
+The admin dashboard is now gated by a Firebase Auth custom claim named `admin`.
+
+1) Grant the claim (requires a Firebase service account):
+
+```bash
+FIREBASE_SERVICE_ACCOUNT=/path/to/serviceAccount.json npm run admin:claim -- <uid> grant
+```
+
+2) Revoke the claim when done:
+
+```bash
+FIREBASE_SERVICE_ACCOUNT=/path/to/serviceAccount.json npm run admin:claim -- <uid> revoke
+```
+
+After changing claims, sign out/in (or refresh) so the client receives the updated token.

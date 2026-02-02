@@ -18,6 +18,8 @@
 - **Admin Dashboard:** Added admin-only metrics dashboard and user activity tracking.
 ### Tests
 - Added admin dashboard E2E test with strict console error checks.
+### Tooling & Security
+- Added Firebase Admin claim helper script, claim-based rule file, and documented claim flow.
 
 ## 2025-11-25
 ### Bug Fixes
