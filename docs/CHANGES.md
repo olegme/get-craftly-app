@@ -1,3 +1,19 @@
+## 2026-07-23T11:41:26+02:00
+
+### Summary
+- Recorded the version 1.2.0 release.
+
+### Files
+- M docs/CHANGES.md
+
+### Verification
+- `npm run build` → passed
+- `npm test` → passed (2 tests)
+- `npm run lint` → passed with one existing `react-hooks/exhaustive-deps` warning in `src/hooks/useBoard.js`
+
+### Notes
+- The existing `v1.2.0` tag points to version-bump commit `a7b5dc4`.
+
 ## 2026-02-01
 ### Release
 - Version: 1.1.0
