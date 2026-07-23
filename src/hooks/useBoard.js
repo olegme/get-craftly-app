@@ -246,12 +246,19 @@ export const useBoard = (user) => {
     if (user) await saveBoard(user.uid, { tags: [...availableTags, newTag] }, user.uid);
   };
 
-  const moveCard = async (draggedCard, targetColumnId, targetRowIndex) => {
+  const moveCard = async (draggedCard, targetColumnId, targetRowIndex, targetCardId = null, placement = 'after') => {
     let updatedColumns = null;
     let didMove = false;
 
     setColumns(prevColumns => {
-      const result = applyMoveCard(prevColumns, draggedCard, targetColumnId, targetRowIndex);
+      const result = applyMoveCard(
+        prevColumns,
+        draggedCard,
+        targetColumnId,
+        targetRowIndex,
+        targetCardId,
+        placement,
+      );
       updatedColumns = result.columns;
       didMove = result.didMove;
       return result.columns;

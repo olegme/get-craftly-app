@@ -5,9 +5,13 @@ import { ItemTypes } from '../Card/ItemTypes';
 export const DropZone = ({ children, columnId, rowIndex, moveCard }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: (item) => moveCard(item, columnId, rowIndex),
+    drop: (item, monitor) => {
+      if (!monitor.didDrop()) {
+        moveCard(item, columnId, rowIndex);
+      }
+    },
     collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+      isOver: !!monitor.isOver({ shallow: true }),
     }),
   }));
 

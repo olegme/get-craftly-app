@@ -1,4 +1,23 @@
-export const applyMoveCard = (columns, draggedCard, targetColumnId, targetRowIndex) => {
+const orderCardsByPriority = (cards, rowTitle) => {
+  const normalizedTitle = rowTitle?.toLowerCase();
+  if (normalizedTitle !== 'wip' && normalizedTitle !== 'planned') {
+    return cards;
+  }
+
+  return [
+    ...cards.filter(card => card.priority),
+    ...cards.filter(card => !card.priority),
+  ];
+};
+
+export const applyMoveCard = (
+  columns,
+  draggedCard,
+  targetColumnId,
+  targetRowIndex,
+  targetCardId = null,
+  placement = 'after',
+) => {
   if (!Array.isArray(columns) || !draggedCard || !draggedCard.id) {
     return { columns, didMove: false };
   }
@@ -49,7 +68,15 @@ export const applyMoveCard = (columns, draggedCard, targetColumnId, targetRowInd
     card.completed = false;
   }
 
-  updatedTargetRow.cards.push(card);
+  const targetCardIndex = targetCardId
+    ? updatedTargetRow.cards.findIndex(targetCard => targetCard.id === targetCardId)
+    : -1;
+  const insertionIndex = targetCardIndex === -1
+    ? updatedTargetRow.cards.length
+    : targetCardIndex + (placement === 'after' ? 1 : 0);
+
+  updatedTargetRow.cards.splice(insertionIndex, 0, card);
+  updatedTargetRow.cards = orderCardsByPriority(updatedTargetRow.cards, updatedTargetRow.title);
 
   return { columns: newColumns, didMove: true };
 };

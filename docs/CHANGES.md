@@ -1,3 +1,32 @@
+## 2026-07-23T15:57:42+02:00
+
+### Summary
+- Added precise card reordering within WIP and Planned priority groups while preserving priority-first display and persisted ordering.
+- Added card-level before/after drop feedback and prevented nested row drop targets from handling the same drop twice.
+- Configured Playwright to use the installed Google Chrome channel on Debian 13.
+- Bumped the application version to 1.3.0.
+
+### Files
+- M docs/CHANGES.md
+- M package.json
+- M playwright.config.js
+- M src/components/Board/DropZone.jsx
+- M src/components/Board/Lane.jsx
+- M src/components/Card/DraggableCard.jsx
+- M src/hooks/boardUtils.js
+- M src/hooks/useBoard.js
+- M tests/boardUtils.test.js
+
+### Verification
+- `npm test` → passed (4 tests)
+- `npm run lint` → passed with one existing `react-hooks/exhaustive-deps` warning in `src/hooks/useBoard.js`
+- `npm run build` → passed
+- `npx playwright test e2e/drag-and-drop.spec.js e2e/lane-auto-ordering.spec.js` → passed (2 tests)
+- Manual local card-ordering test → passed
+
+### Notes
+- The admin dashboard E2E test was excluded because admin rights for the test user were intentionally deferred.
+
 ## 2026-07-23T11:41:26+02:00
 
 ### Summary

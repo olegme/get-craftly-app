@@ -57,6 +57,7 @@ export const Lane = ({
                       card={card}
                       columnId={column.id}
                       rows={column.rows}
+                      moveCard={moveCard}
                       updateCardTitle={updateCardTitle}
                       updateCardTags={updateCardTags}
                       availableTags={availableTags}

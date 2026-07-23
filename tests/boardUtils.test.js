@@ -62,3 +62,50 @@ test('moving from Done to WIP clears completion', () => {
   const wipCard = laneA.rows[0].cards.find(card => card.id === 'card-1');
   assert.equal(wipCard.completed, false);
 });
+
+test('reorders cards within the same priority group', () => {
+  const columns = baseColumns();
+  columns[0].rows[0].cards = [
+    { id: 'priority-a', title: 'Priority A', priority: true },
+    { id: 'priority-b', title: 'Priority B', priority: true },
+    { id: 'regular-a', title: 'Regular A', priority: false },
+    { id: 'regular-b', title: 'Regular B', priority: false },
+  ];
+
+  const result = applyMoveCard(
+    columns,
+    columns[0].rows[0].cards[1],
+    'lane-a',
+    0,
+    'priority-a',
+    'before',
+  );
+
+  assert.deepEqual(
+    result.columns[0].rows[0].cards.map(card => card.id),
+    ['priority-b', 'priority-a', 'regular-a', 'regular-b'],
+  );
+});
+
+test('preserves priority-first ordering when a regular card is dropped before a priority card', () => {
+  const columns = baseColumns();
+  columns[0].rows[0].cards = [
+    { id: 'priority-a', title: 'Priority A', priority: true },
+    { id: 'regular-a', title: 'Regular A', priority: false },
+    { id: 'regular-b', title: 'Regular B', priority: false },
+  ];
+
+  const result = applyMoveCard(
+    columns,
+    columns[0].rows[0].cards[2],
+    'lane-a',
+    0,
+    'priority-a',
+    'before',
+  );
+
+  assert.deepEqual(
+    result.columns[0].rows[0].cards.map(card => card.id),
+    ['priority-a', 'regular-b', 'regular-a'],
+  );
+});
